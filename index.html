@@ -154,6 +154,17 @@
   .toast{position:absolute; left:20px; right:20px; bottom:100px; background:var(--navy); color:#fff; padding:14px 16px; border-radius:14px; display:flex; align-items:center; gap:10px; font-size:.86rem; font-weight:600; transform:translateY(30px); opacity:0; pointer-events:none; transition:all .3s ease; z-index:100;}
   .toast.show{transform:translateY(0); opacity:1;}
   .toast .star{color:var(--marigold); flex-shrink:0;}
+
+  @media print{
+    body{background:#fff !important;}
+    .phone{box-shadow:none !important; border:none !important; max-width:100% !important; height:auto !important; min-height:0 !important;}
+    .tabbar, .topbar, .toast, #onboarding, .install-banner{display:none !important;}
+    .screen{display:none !important; padding-bottom:0 !important; overflow:visible !important;}
+    .screen.active{display:block !important;}
+    #screen-detail{padding-top:20px;}
+    .mission-hero{background:#fff !important;}
+    .btn-complete{display:none !important;}
+  }
 </style>
 </head>
 <body>
@@ -242,8 +253,9 @@
   </div>
 
   <div class="screen" id="screen-detail">
-    <div class="topbar" style="background:transparent; border:none; position:absolute; width:100%; z-index:10;">
+    <div class="topbar" style="background:transparent; border:none; position:absolute; width:100%; z-index:10; justify-content:space-between;">
       <button class="back" onclick="backFromDetail()" style="background:rgba(255,255,255,0.7);"><svg class="icon" style="width:18px;height:18px;"><use href="#i-back"/></svg></button>
+      <button class="back" onclick="printMission()" style="background:rgba(255,255,255,0.7);" title="Imprimir / Salvar como PDF"><svg class="icon" style="width:18px;height:18px;"><use href="#i-printer"/></svg></button>
     </div>
     <div class="mission-hero">
       <div class="icwrap"><svg class="icon" style="width:30px;height:30px;color:var(--coral-dark);" id="detailIcon"><use href="#i-magnifier"/></svg></div>
@@ -306,7 +318,7 @@
         <div class="row"><span class="ic"><svg class="icon" style="width:18px;height:18px;"><use href="#i-printer"/></svg></span>
         <div><h4>Modo Impressão</h4><p>Baixe qualquer missão em PDF pra imprimir</p></div></div>
         <div class="expand-list" style="display:block; padding-top:8px;">
-          <p style="font-size:.84rem; color:var(--ink-soft);">Abra qualquer missão e toque no ícone de impressora no topo pra gerar a versão em papel.</p>
+          <p style="font-size:.84rem; color:var(--ink-soft);">Abra qualquer missão e toque no ícone de impressora no topo. Na tela que abrir, escolha "Salvar como PDF" no destino da impressão pra baixar o arquivo, ou mande direto pra impressora.</p>
         </div>
       </div>
     </div>
@@ -543,6 +555,7 @@ function toggleComplete(){
   renderAll();
 }
 function backFromDetail(){ showScreen(lastListScreen || 'screen-home'); }
+function printMission(){ window.print(); }
 function showToast(msg){
   const t = document.getElementById('toast');
   document.getElementById('toastMsg').textContent = msg;
@@ -689,8 +702,13 @@ function triggerInstall(){
   if(deferredPrompt){
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(()=>{ deferredPrompt = null; document.getElementById('installBanner').style.display = 'none'; });
+    return;
+  }
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if(isIOS){
+    alert('No iPhone: toque no ícone de Compartilhar do Safari (o quadrado com a seta pra cima) e escolha "Adicionar à Tela de Início".');
   } else {
-    alert('No iPhone: toque no ícone de Compartilhar do Safari e escolha "Adicionar à Tela de Início".');
+    alert('Não achei o aviso automático agora (o Chrome já deve ter reconhecido o app).\n\nInstale manualmente: toque nos 3 pontinhos (⋮) no canto superior direito do Chrome → "Instalar aplicativo" ou "Adicionar à tela inicial".');
   }
 }
 function dismissInstall(){
