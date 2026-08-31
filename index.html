@@ -335,9 +335,9 @@
       <div class="sub">Missão Sem Telas</div>
     </div>
     <div class="profile-card">
-      <div class="profile-row"><svg class="icon ic" style="width:18px;height:18px;"><use href="#i-heart"/></svg> Sobre o desafio <svg class="icon chev" style="width:16px;height:16px;"><use href="#i-chevron"/></svg></div>
-      <div class="profile-row"><svg class="icon ic" style="width:18px;height:18px;"><use href="#i-book"/></svg> Guia para os pais <svg class="icon chev" style="width:16px;height:16px;"><use href="#i-chevron"/></svg></div>
-      <div class="profile-row"><svg class="icon ic" style="width:18px;height:18px;"><use href="#i-printer"/></svg> Materiais para imprimir <svg class="icon chev" style="width:16px;height:16px;"><use href="#i-chevron"/></svg></div>
+      <div class="profile-row" onclick="openInfo('sobre')"><svg class="icon ic" style="width:18px;height:18px;"><use href="#i-heart"/></svg> Sobre o desafio <svg class="icon chev" style="width:16px;height:16px;"><use href="#i-chevron"/></svg></div>
+      <div class="profile-row" onclick="openInfo('guia')"><svg class="icon ic" style="width:18px;height:18px;"><use href="#i-book"/></svg> Guia para os pais <svg class="icon chev" style="width:16px;height:16px;"><use href="#i-chevron"/></svg></div>
+      <div class="profile-row" onclick="openInfo('imprimir')"><svg class="icon ic" style="width:18px;height:18px;"><use href="#i-printer"/></svg> Materiais para imprimir <svg class="icon chev" style="width:16px;height:16px;"><use href="#i-chevron"/></svg></div>
     </div>
     <div class="profile-card">
       <div class="profile-row" onclick="triggerInstall()"><svg class="icon ic" style="width:18px;height:18px;"><use href="#i-download"/></svg> Instalar app na tela inicial</div>
@@ -354,6 +354,14 @@
   </div>
 
   <div class="toast" id="toast"><svg class="icon star" style="width:18px;height:18px;"><use href="#i-trophy"/></svg> <span id="toastMsg">Missão concluída!</span></div>
+
+  <div id="infoModal" style="display:none; position:absolute; inset:0; z-index:400; background:var(--bg);">
+    <div class="topbar">
+      <button class="back" onclick="closeInfo()"><svg class="icon" style="width:18px;height:18px;"><use href="#i-back"/></svg></button>
+      <h3 id="infoTitle">Título</h3>
+    </div>
+    <div style="padding:20px; overflow-y:auto; height:calc(100% - 66px);" id="infoBody"></div>
+  </div>
 </div>
 
 <script>
@@ -592,6 +600,55 @@ function renderBonus(){
   document.getElementById('guiaList').innerHTML = GUIA_PAIS.map(r=>'<li><svg class="icon" style="width:14px;height:14px;color:var(--forest);"><use href="#i-heart"/></svg>'+r+'</li>').join('');
 }
 function toggleBonus(card){ card.classList.toggle('open'); }
+
+const INFO_CONTENT = {
+  sobre: {
+    title: 'Sobre o desafio',
+    html: `<p style="font-size:.92rem; color:var(--ink-soft); margin-bottom:14px; line-height:1.6;">
+      Você foi escolhido para acompanhar seu filho ou filha em uma missão especial: 21 dias, 21 pequenas
+      aventuras, criadas para trocar um pouco de tempo de tela por brincadeira, criatividade e presença.</p>
+      <p style="font-size:.92rem; color:var(--ink-soft); margin-bottom:14px; line-height:1.6;">
+      Não existe hora certa pra fazer as missões. Pode ser depois da escola, antes do jantar, ou num domingo
+      de manhã — o importante é escolher um momento em que vocês consigam estar presentes, mesmo que por
+      15 ou 20 minutinhos.</p>
+      <p style="font-size:.92rem; color:var(--ink-soft); line-height:1.6;">
+      Este material foi feito para incentivar brincadeiras e momentos em família. Ele não é um tratamento
+      médico ou psicológico, e os resultados podem variar de família para família. Vá no ritmo que for bom
+      para vocês.</p>`
+  },
+  guia: {
+    title: 'Guia para os pais',
+    html: `<p style="font-size:.88rem; color:var(--ink-soft); margin-bottom:16px;">Algumas ideias pra manter o desafio leve, sem virar mais uma obrigação na rotina:</p>
+      <ul style="display:flex; flex-direction:column; gap:14px;">` +
+      GUIA_PAIS.map(g=>`<li style="display:flex; gap:10px; align-items:flex-start; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:14px; font-size:.88rem; color:var(--ink-soft);">
+        <svg class="icon" style="width:16px;height:16px;color:var(--forest); flex-shrink:0; margin-top:1px;"><use href="#i-heart"/></svg>${g}</li>`).join('') +
+      `</ul>`
+  },
+  imprimir: {
+    title: 'Materiais para imprimir',
+    html: `<p style="font-size:.9rem; color:var(--ink-soft); margin-bottom:16px; line-height:1.6;">
+      Prefere colar as missões na parede ou na geladeira? Sem problema — todo o conteúdo também existe em
+      versão para impressão.</p>
+      <div style="background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:12px; display:flex; gap:12px; align-items:center;">
+        <span style="width:36px;height:36px;border-radius:10px;background:var(--marigold-light); color:var(--marigold-dark); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg class="icon" style="width:18px;height:18px;"><use href="#i-printer"/></svg></span>
+        <div><h4 style="font-size:.92rem;">Ficha de cada missão</h4><p style="font-size:.8rem; color:var(--ink-soft);">Abra a missão desejada e use a opção de impressão do navegador.</p></div>
+      </div>
+      <div style="background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; gap:12px; align-items:center;">
+        <span style="width:36px;height:36px;border-radius:10px;background:var(--forest-light); color:var(--forest); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg class="icon" style="width:18px;height:18px;"><use href="#i-chart"/></svg></span>
+        <div><h4 style="font-size:.92rem;">Quadro de progresso</h4><p style="font-size:.8rem; color:var(--ink-soft);">Baixe o painel das 21 missões pra colar na geladeira.</p></div>
+      </div>`
+  }
+};
+
+function openInfo(key){
+  const data = INFO_CONTENT[key];
+  document.getElementById('infoTitle').textContent = data.title;
+  document.getElementById('infoBody').innerHTML = data.html;
+  document.getElementById('infoModal').style.display = 'block';
+}
+function closeInfo(){
+  document.getElementById('infoModal').style.display = 'none';
+}
 function sortearCarta(){
   const c = CARTAS[Math.floor(Math.random()*CARTAS.length)];
   document.getElementById('sorteioCard').textContent = c;
