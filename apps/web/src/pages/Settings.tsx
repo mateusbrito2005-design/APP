@@ -9,9 +9,10 @@ interface SettingsResponse {
     fbAccessTokenSet: boolean;
     hotmartSecretSet: boolean;
     kiwifySecretSet: boolean;
+    wiapySecretSet: boolean;
     genericWebhookSecretSet: boolean;
   };
-  webhookUrls: { hotmart: string; kiwify: string; generic: string };
+  webhookUrls: { hotmart: string; kiwify: string; wiapy: string; generic: string };
 }
 
 function CopyField({ label, value }: { label: string; value: string }) {
@@ -54,6 +55,7 @@ export default function Settings() {
   const [fbPixelId, setFbPixelId] = useState("");
   const [hotmartSecret, setHotmartSecret] = useState("");
   const [kiwifySecret, setKiwifySecret] = useState("");
+  const [wiapySecret, setWiapySecret] = useState("");
   const [genericWebhookSecret, setGenericWebhookSecret] = useState("");
 
   async function load() {
@@ -104,10 +106,12 @@ export default function Settings() {
       await api.put("/api/settings", {
         hotmartSecret: hotmartSecret || undefined,
         kiwifySecret: kiwifySecret || undefined,
+        wiapySecret: wiapySecret || undefined,
         genericWebhookSecret: genericWebhookSecret || undefined,
       });
       setHotmartSecret("");
       setKiwifySecret("");
+      setWiapySecret("");
       setGenericWebhookSecret("");
       setMessage("Segredos de webhook salvos.");
       await load();
@@ -191,6 +195,7 @@ export default function Settings() {
         </p>
         <CopyField label="Hotmart" value={data.webhookUrls.hotmart} />
         <CopyField label="Kiwify" value={data.webhookUrls.kiwify} />
+        <CopyField label="Wiapy" value={data.webhookUrls.wiapy} />
         <CopyField label="Genérico / checkout próprio" value={data.webhookUrls.generic} />
 
         <form className="form-grid" onSubmit={handleSaveWebhookSecrets} style={{ marginTop: 20 }}>
@@ -201,6 +206,15 @@ export default function Settings() {
           <label className="field">
             <span>Segredo Kiwify {data.settings.kiwifySecretSet && <em className="muted small">(configurado)</em>}</span>
             <input type="password" value={kiwifySecret} onChange={(e) => setKiwifySecret(e.target.value)} placeholder="Opcional, mas recomendado" />
+          </label>
+          <label className="field">
+            <span>Token Wiapy {data.settings.wiapySecretSet && <em className="muted small">(configurado)</em>}</span>
+            <input
+              type="password"
+              value={wiapySecret}
+              onChange={(e) => setWiapySecret(e.target.value)}
+              placeholder="Defina um token e cole o mesmo valor no painel de webhook da Wiapy"
+            />
           </label>
           <label className="field">
             <span>Segredo genérico (X-Webhook-Secret) {data.settings.genericWebhookSecretSet && <em className="muted small">(configurado)</em>}</span>

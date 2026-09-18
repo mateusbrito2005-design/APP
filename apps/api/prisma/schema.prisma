@@ -35,6 +35,7 @@ model Integration {
 
   hotmartSecret        String?
   kiwifySecret         String?
+  wiapySecret          String?
   genericWebhookSecret String?
 
   updatedAt DateTime @updatedAt

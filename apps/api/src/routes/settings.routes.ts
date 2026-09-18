@@ -25,11 +25,13 @@ settingsRouter.get("/", async (req: AuthedRequest, res) => {
       fbAccessTokenSet: !!integration.fbAccessToken,
       hotmartSecretSet: !!integration.hotmartSecret,
       kiwifySecretSet: !!integration.kiwifySecret,
+      wiapySecretSet: !!integration.wiapySecret,
       genericWebhookSecretSet: !!integration.genericWebhookSecret,
     },
     webhookUrls: {
       hotmart: `${env.publicApiUrl}/api/webhooks/hotmart/${integration.webhookToken}`,
       kiwify: `${env.publicApiUrl}/api/webhooks/kiwify/${integration.webhookToken}`,
+      wiapy: `${env.publicApiUrl}/api/webhooks/wiapy/${integration.webhookToken}`,
       generic: `${env.publicApiUrl}/api/webhooks/generic/${integration.webhookToken}`,
     },
   });
@@ -41,6 +43,7 @@ const updateSchema = z.object({
   fbPixelId: z.string().optional(),
   hotmartSecret: z.string().optional(),
   kiwifySecret: z.string().optional(),
+  wiapySecret: z.string().optional(),
   genericWebhookSecret: z.string().optional(),
 });
 

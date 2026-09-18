@@ -82,6 +82,9 @@ suportado:
   "Segredo Hotmart", o `hottok` enviado pela Hotmart é validado.
 - **Kiwify**: cole a URL nas configurações de webhook da conta. Se configurar o
   "Segredo Kiwify", a assinatura enviada em `?signature=` é validada.
+- **Wiapy**: cole a URL em Integrações → Webhook, no painel da Wiapy, e defina um
+  token — o mesmo valor deve ser colado em "Token Wiapy" nas Configurações daqui. A
+  Wiapy reenvia esse token no header `Authorization` de cada requisição.
 - **Genérico**: para qualquer outro gateway ou um checkout próprio. Espera um JSON
   normalizado:
 

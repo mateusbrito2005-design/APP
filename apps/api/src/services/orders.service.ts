@@ -80,6 +80,44 @@ export function parseKiwify(payload: any): ParsedOrder {
 }
 
 /**
+ * Wiapy webhook. Payload shape: { payment: { id, status, amount (in cents),
+ * payment_method, dt_create, ... }, customer: { name, email, ... },
+ * checkout: { id, title, amount }, products: [...], tracking: { src, sck,
+ * utm_source, utm_medium, utm_campaign, utm_content, utm_term } }. The
+ * "tracking.src" / "tracking.sck" fields are Wiapy's generic passthrough
+ * params — our tracking-link redirect mirrors the click_id into both so it
+ * round-trips back here.
+ */
+export function parseWiapy(payload: any): ParsedOrder {
+  const payment = payload?.payment ?? {};
+  const tracking = payload?.tracking ?? {};
+  const customer = payload?.customer ?? {};
+  const checkout = payload?.checkout ?? {};
+  const products = payload?.products ?? [];
+
+  const statusRaw = String(payment.status ?? "").toLowerCase();
+  let status: OrderStatus = "pending";
+  if (statusRaw === "paid" || statusRaw.includes("approved")) status = "paid";
+  else if (["refunded", "chargeback", "refused", "canceled", "cancelled"].includes(statusRaw)) status = "refunded";
+  else if (statusRaw.includes("waiting") || statusRaw.includes("pending")) status = "pending";
+
+  return {
+    externalId: String(payment.id ?? checkout.id ?? ""),
+    status,
+    amount: Number(payment.amount ?? checkout.amount ?? 0) / 100,
+    currency: "BRL",
+    customerEmail: customer.email,
+    productName: checkout.title ?? products?.[0]?.name,
+    clickId: firstDefined(tracking.src, tracking.sck),
+    utmSource: tracking.utm_source,
+    utmMedium: tracking.utm_medium,
+    utmCampaign: tracking.utm_campaign,
+    utmContent: tracking.utm_content,
+    utmTerm: tracking.utm_term,
+  };
+}
+
+/**
  * Generic / custom webhook: use this for gateways not natively supported, or to
  * integrate a checkout you built yourself. Expects a normalized JSON body:
  * { external_id, status: "paid"|"refunded"|"pending"|"canceled", amount, currency,

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../prisma";
-import { parseHotmart, parseKiwify, parseGeneric, ingestOrder } from "../services/orders.service";
+import { parseHotmart, parseKiwify, parseWiapy, parseGeneric, ingestOrder } from "../services/orders.service";
 import { hmacSha256Hex, safeEqual } from "../services/webhookVerify";
 
 export const webhooksRouter = Router();
@@ -64,6 +64,25 @@ webhooksRouter.post("/kiwify/:token", async (req, res) => {
   await logAndRespond(integration.userId, "kiwify", req.body, res, async () => {
     const parsed = parseKiwify(req.body);
     await ingestOrder(integration.userId, "kiwify", parsed, req.body);
+  });
+});
+
+// Wiapy: sends the token you configured in their webhook settings verbatim as
+// the "Authorization" header (not a signature) on every request.
+webhooksRouter.post("/wiapy/:token", async (req, res) => {
+  const integration = await findUserByToken(req.params.token);
+  if (!integration) return res.status(404).json({ error: "webhook não encontrado" });
+
+  if (integration.wiapySecret) {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader || !safeEqual(String(authHeader), integration.wiapySecret)) {
+      return res.status(401).json({ error: "assinatura inválida" });
+    }
+  }
+
+  await logAndRespond(integration.userId, "wiapy", req.body, res, async () => {
+    const parsed = parseWiapy(req.body);
+    await ingestOrder(integration.userId, "wiapy", parsed, req.body);
   });
 });
 

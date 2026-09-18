@@ -46,6 +46,11 @@ redirectRouter.get("/r/:code", async (req, res) => {
   if (utmContent) destination.searchParams.set("utm_content", utmContent);
   if (utmTerm) destination.searchParams.set("utm_term", utmTerm);
   destination.searchParams.set("click_id", clickId);
+  // Mirrored into the generic "src"/"sck" passthrough params some checkout
+  // platforms (Wiapy, Hotmart) echo back in their webhook's tracking object,
+  // so the click can be matched even when a gateway doesn't forward click_id.
+  destination.searchParams.set("src", clickId);
+  destination.searchParams.set("sck", clickId);
   if (query.fbclid) destination.searchParams.set("fbclid", query.fbclid);
 
   res.redirect(302, destination.toString());
