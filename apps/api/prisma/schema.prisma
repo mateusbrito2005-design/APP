@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  integration   Integration?
+  trackingLinks TrackingLink[]
+  clicks        Click[]
+  orders        Order[]
+  adSpendDaily  AdSpendDaily[]
+  webhookLogs   WebhookLog[]
+}
+
+model Integration {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  webhookToken String @unique @default(uuid())
+
+  fbAccessToken String?
+  fbAdAccountId String?
+  fbPixelId     String?
+
+  hotmartSecret        String?
+  kiwifySecret         String?
+  genericWebhookSecret String?
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model TrackingLink {
+  id             String  @id @default(uuid())
+  userId         String
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  code           String  @unique
+  destinationUrl String
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmContent     String?
+  utmTerm        String?
+  createdAt      DateTime @default(now())
+
+  clicks Click[]
+
+  @@index([userId])
+}
+
+model Click {
+  id             String        @id @default(uuid())
+  clickId        String        @unique
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trackingLinkId String?
+  trackingLink   TrackingLink? @relation(fields: [trackingLinkId], references: [id], onDelete: SetNull)
+
+  ip        String?
+  userAgent String?
+  fbclid    String?
+  fbp       String?
+
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmContent  String?
+  utmTerm     String?
+
+  createdAt DateTime @default(now())
+
+  order Order?
+
+  @@index([userId, createdAt])
+}
+
+model Order {
+  id         String  @id @default(uuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gateway    String
+  externalId String
+  status     String
+
+  clickId String? @unique
+  click   Click?  @relation(fields: [clickId], references: [clickId])
+
+  amount        Decimal @db.Decimal(12, 2)
+  currency      String  @default("BRL")
+  customerEmail String?
+  productName   String?
+
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmContent  String?
+  utmTerm     String?
+
+  fbConversionSentAt DateTime?
+  rawPayload         Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gateway, externalId])
+  @@index([userId, createdAt])
+  @@index([userId, status])
+}
+
+model AdSpendDaily {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         DateTime @db.Date
+  campaignId   String
+  campaignName String
+  spend        Decimal  @db.Decimal(12, 2)
+  impressions  Int      @default(0)
+  clicks       Int      @default(0)
+
+  @@unique([userId, date, campaignId])
+  @@index([userId, date])
+}
+
+model WebhookLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gateway    String
+  payload    Json
+  processed  Boolean  @default(false)
+  error      String?
+  receivedAt DateTime @default(now())
+
+  @@index([userId, receivedAt])
+}
