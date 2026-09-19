@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { randomUUID } from "crypto";
 import { prisma } from "../prisma";
+import { isBotUserAgent } from "../utils/botDetection";
 
 export const redirectRouter = Router();
 
@@ -22,22 +23,29 @@ redirectRouter.get("/r/:code", async (req, res) => {
   const utmContent = query.utm_content ?? link.utmContent ?? undefined;
   const utmTerm = query.utm_term ?? link.utmTerm ?? undefined;
 
-  await prisma.click.create({
-    data: {
-      clickId,
-      userId: link.userId,
-      trackingLinkId: link.id,
-      ip: (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ?? req.socket.remoteAddress ?? undefined,
-      userAgent: req.headers["user-agent"],
-      fbclid: query.fbclid,
-      fbp: req.cookies?.["_fbp"],
-      utmSource,
-      utmMedium,
-      utmCampaign,
-      utmContent,
-      utmTerm,
-    },
-  });
+  // Link-preview crawlers (Meta, WhatsApp, Telegram...) fetch this URL to
+  // build a thumbnail whenever the link is shared or reviewed — that request
+  // looks identical to a real click but isn't a visitor, so we still redirect
+  // it (the crawler needs a valid response to build the preview) without
+  // logging a Click or spending an attribution slot on it.
+  if (!isBotUserAgent(req.headers["user-agent"])) {
+    await prisma.click.create({
+      data: {
+        clickId,
+        userId: link.userId,
+        trackingLinkId: link.id,
+        ip: (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ?? req.socket.remoteAddress ?? undefined,
+        userAgent: req.headers["user-agent"],
+        fbclid: query.fbclid,
+        fbp: req.cookies?.["_fbp"],
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        utmContent,
+        utmTerm,
+      },
+    });
+  }
 
   const destination = new URL(link.destinationUrl);
   if (utmSource) destination.searchParams.set("utm_source", utmSource);
