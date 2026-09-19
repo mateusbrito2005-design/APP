@@ -23,10 +23,12 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
   const userId = req.userId!;
   const { since, until } = parseRange(req);
 
-  const [orders, spendRows, clicksCount] = await Promise.all([
+  const [orders, spendRows, clicksCount, pageViewCount, checkoutStartedCount] = await Promise.all([
     prisma.order.findMany({ where: { userId, createdAt: { gte: since, lte: until } } }),
     prisma.adSpendDaily.findMany({ where: { userId, date: { gte: since, lte: until } } }),
     prisma.click.count({ where: { userId, createdAt: { gte: since, lte: until } } }),
+    prisma.click.count({ where: { userId, createdAt: { gte: since, lte: until }, pageViewedAt: { not: null } } }),
+    prisma.click.count({ where: { userId, createdAt: { gte: since, lte: until }, checkoutStartedAt: { not: null } } }),
   ]);
 
   const paidOrders = orders.filter((o) => o.status === "paid");
@@ -40,6 +42,8 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
 
   const funnel = {
     clicks: clicksCount,
+    pageViews: pageViewCount,
+    checkoutsStarted: checkoutStartedCount,
     ordersStarted: orders.length,
     ordersApproved: paidOrders.length,
   };

@@ -15,6 +15,32 @@ interface SettingsResponse {
   webhookUrls: { hotmart: string; kiwify: string; wiapy: string; generic: string };
 }
 
+function CopyCodeBlock({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="code-block">
+      <button
+        type="button"
+        className="btn btn-ghost btn-sm code-block-copy"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(code);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          } catch {
+            // ignore
+          }
+        }}
+      >
+        {copied ? "Copiado!" : "Copiar"}
+      </button>
+      <pre>
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
 function CopyField({ label, value }: { label: string; value: string }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -42,6 +68,45 @@ function CopyField({ label, value }: { label: string; value: string }) {
   );
 }
 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+
+function buildTrackingSnippet(apiUrl: string, checkoutDomain: string) {
+  return `<script>
+(function () {
+  var API = "${apiUrl}";
+  var CHECKOUT_MATCH = "${checkoutDomain}";
+  var params = new URLSearchParams(window.location.search);
+  var clickId = params.get("click_id") || sessionStorage.getItem("utmtrack_click_id");
+  if (params.get("click_id")) sessionStorage.setItem("utmtrack_click_id", params.get("click_id"));
+  if (!clickId) return;
+
+  function sendEvent(event) {
+    var payload = JSON.stringify({ click_id: clickId, event: event });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(API + "/api/tracking/event", new Blob([payload], { type: "application/json" }));
+    } else {
+      fetch(API + "/api/tracking/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true });
+    }
+  }
+
+  sendEvent("page_view");
+
+  document.addEventListener("click", function (e) {
+    var link = e.target.closest("a[href*='" + CHECKOUT_MATCH + "']");
+    if (!link) return;
+    sendEvent("checkout_initiated");
+    try {
+      var url = new URL(link.href);
+      url.searchParams.set("click_id", clickId);
+      url.searchParams.set("src", clickId);
+      url.searchParams.set("sck", clickId);
+      link.href = url.toString();
+    } catch (err) {}
+  }, true);
+})();
+</script>`;
+}
+
 export default function Settings() {
   const [data, setData] = useState<SettingsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,6 +118,7 @@ export default function Settings() {
   const [fbAccessToken, setFbAccessToken] = useState("");
   const [fbAdAccountId, setFbAdAccountId] = useState("");
   const [fbPixelId, setFbPixelId] = useState("");
+  const [checkoutDomain, setCheckoutDomain] = useState("wiapy.com");
   const [hotmartSecret, setHotmartSecret] = useState("");
   const [kiwifySecret, setKiwifySecret] = useState("");
   const [wiapySecret, setWiapySecret] = useState("");
@@ -231,6 +297,20 @@ export default function Settings() {
             </button>
           </div>
         </form>
+      </div>
+
+      <div className="card">
+        <h3>Script de rastreamento (página de vendas)</h3>
+        <p className="muted small" style={{ marginBottom: 16 }}>
+          Cole esse script na sua página de vendas (a que vem antes do checkout) pra rastrear "Visita de página" e
+          "Iniciar checkout" no funil do Painel. Ele também repassa automaticamente o <code>click_id</code> pro link do
+          checkout quando alguém clica nele.
+        </p>
+        <label className="field">
+          <span>Domínio do link de checkout (pra saber em qual botão/link rastrear o clique)</span>
+          <input value={checkoutDomain} onChange={(e) => setCheckoutDomain(e.target.value)} placeholder="wiapy.com" />
+        </label>
+        <CopyCodeBlock code={buildTrackingSnippet(API_URL, checkoutDomain)} />
       </div>
     </div>
   );

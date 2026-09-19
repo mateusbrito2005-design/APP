@@ -593,6 +593,35 @@ button {
   word-break: break-all;
 }
 
+/* ---------- code block ---------- */
+.code-block {
+  position: relative;
+  margin-top: 8px;
+}
+
+.code-block pre {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  overflow-x: auto;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.code-block code {
+  background: none;
+  padding: 0;
+  color: #d7dae4;
+  white-space: pre;
+}
+
+.code-block-copy {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
 /* ---------- funnel ---------- */
 .funnel-track {
   display: flex;

@@ -9,12 +9,19 @@ import { webhooksRouter } from "./routes/webhooks.routes";
 import { facebookRouter } from "./routes/facebook.routes";
 import { dashboardRouter } from "./routes/dashboard.routes";
 import { settingsRouter } from "./routes/settings.routes";
+import { trackingRouter } from "./routes/tracking.routes";
 
 const app = express();
 
+app.use(express.json());
+
+// Mounted before the restrictive CORS middleware below: this endpoint is a
+// tracking beacon meant to be called from arbitrary customer-owned pages
+// (not just our own frontend), so it manages its own permissive CORS.
+app.use("/api/tracking", trackingRouter);
+
 app.use(cors({ origin: env.webOrigins, credentials: true }));
 app.use(cookieParser());
-app.use(express.json());
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 

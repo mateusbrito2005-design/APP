@@ -80,6 +80,9 @@ model Click {
   utmContent  String?
   utmTerm     String?
 
+  pageViewedAt       DateTime?
+  checkoutStartedAt  DateTime?
+
   createdAt DateTime @default(now())
 
   order Order?

@@ -27,10 +27,17 @@ interface SummaryResponse {
   };
   series: { date: string; revenue: number; spend: number }[];
   topCampaigns: { name: string; spend: number; revenue: number; roas: number | null }[];
-  funnel: { clicks: number; ordersStarted: number; ordersApproved: number };
+  funnel: {
+    clicks: number;
+    pageViews: number;
+    checkoutsStarted: number;
+    ordersStarted: number;
+    ordersApproved: number;
+  };
 }
 
 const RANGE_OPTIONS = [
+  { label: "Hoje", days: 1 },
   { label: "7 dias", days: 7 },
   { label: "14 dias", days: 14 },
   { label: "30 dias", days: 30 },
@@ -141,8 +148,10 @@ export default function Dashboard() {
             <FunnelChart
               stages={[
                 { label: "Cliques", value: data.funnel.clicks },
-                { label: "Pedidos iniciados", value: data.funnel.ordersStarted },
-                { label: "Vendas aprovadas", value: data.funnel.ordersApproved },
+                { label: "Visitou página", value: data.funnel.pageViews },
+                { label: "Iniciou checkout", value: data.funnel.checkoutsStarted },
+                { label: "Venda iniciada (PIX)", value: data.funnel.ordersStarted },
+                { label: "Venda aprovada", value: data.funnel.ordersApproved },
               ]}
             />
           </div>
