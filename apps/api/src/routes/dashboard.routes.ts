@@ -39,11 +39,11 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
   const revenue = paidOrders.reduce((sum, o) => sum + Number(o.amount), 0);
   const spend = spendRows.reduce((sum, r) => sum + Number(r.spend), 0);
   const ordersCount = paidOrders.length;
-  const roas = spend > 0 ? revenue / spend : null;
+  const currencyMismatch = spend > 0 && spendCurrency !== revenueCurrency;
+  const roas = spend > 0 && !currencyMismatch ? revenue / spend : null;
   const cpa = ordersCount > 0 && spend > 0 ? spend / ordersCount : null;
   const avgTicket = ordersCount > 0 ? revenue / ordersCount : 0;
-  const profit = revenue - spend;
-  const currencyMismatch = spend > 0 && revenue > 0 && spendCurrency !== revenueCurrency;
+  const profit = currencyMismatch ? null : revenue - spend;
 
   const funnel = {
     clicks: clicksCount,
@@ -94,7 +94,7 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
         name,
         spend: campSpend,
         revenue: campRevenue,
-        roas: campSpend > 0 ? campRevenue / campSpend : null,
+        roas: campSpend > 0 && !currencyMismatch ? campRevenue / campSpend : null,
       };
     })
     .sort((a, b) => b.revenue - a.revenue)

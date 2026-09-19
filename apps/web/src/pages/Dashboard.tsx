@@ -23,7 +23,7 @@ interface SummaryResponse {
     roas: number | null;
     cpa: number | null;
     avgTicket: number;
-    profit: number;
+    profit: number | null;
   };
   currencies: { spend: string; revenue: string; mismatch: boolean };
   series: { date: string; revenue: number; spend: number }[];
@@ -124,8 +124,8 @@ export default function Dashboard() {
       {data?.currencies.mismatch && (
         <div className="alert alert-info">
           Seu gasto em anúncios está em <strong>{data.currencies.spend}</strong> e suas vendas em{" "}
-          <strong>{data.currencies.revenue}</strong> — Lucro, ROAS e CPA misturam as duas moedas sem conversão, então
-          use com cautela até configurar a mesma moeda dos dois lados.
+          <strong>{data.currencies.revenue}</strong> — Lucro e ROAS ficam indisponíveis (mostrando "—") até as duas
+          moedas serem iguais, pra não misturar valores sem conversão.
         </div>
       )}
 
@@ -138,8 +138,8 @@ export default function Dashboard() {
             <StatCard label="Receita" value={formatCurrency(data.totals.revenue, data.currencies.revenue)} tone="positive" />
             <StatCard
               label="Lucro"
-              value={formatCurrency(data.totals.profit, data.currencies.revenue)}
-              tone={data.totals.profit >= 0 ? "positive" : "negative"}
+              value={data.totals.profit != null ? formatCurrency(data.totals.profit, data.currencies.revenue) : "—"}
+              tone={data.totals.profit != null ? (data.totals.profit >= 0 ? "positive" : "negative") : "default"}
             />
             <StatCard
               label="ROAS"
