@@ -23,15 +23,19 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
   const userId = req.userId!;
   const { since, until } = parseRange(req);
 
-  const [orders, spendRows, clicksCount, pageViewCount, checkoutStartedCount] = await Promise.all([
+  const [orders, spendRows, clicksCount, pageViewCount, checkoutStartedCount, integration] = await Promise.all([
     prisma.order.findMany({ where: { userId, createdAt: { gte: since, lte: until } } }),
     prisma.adSpendDaily.findMany({ where: { userId, date: { gte: since, lte: until } } }),
     prisma.click.count({ where: { userId, createdAt: { gte: since, lte: until } } }),
     prisma.click.count({ where: { userId, createdAt: { gte: since, lte: until }, pageViewedAt: { not: null } } }),
     prisma.click.count({ where: { userId, createdAt: { gte: since, lte: until }, checkoutStartedAt: { not: null } } }),
+    prisma.integration.findUnique({ where: { userId } }),
   ]);
 
+  const spendCurrency = integration?.fbCurrency ?? "BRL";
+
   const paidOrders = orders.filter((o) => o.status === "paid");
+  const revenueCurrency = paidOrders[0]?.currency ?? "BRL";
   const revenue = paidOrders.reduce((sum, o) => sum + Number(o.amount), 0);
   const spend = spendRows.reduce((sum, r) => sum + Number(r.spend), 0);
   const ordersCount = paidOrders.length;
@@ -39,6 +43,7 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
   const cpa = ordersCount > 0 && spend > 0 ? spend / ordersCount : null;
   const avgTicket = ordersCount > 0 ? revenue / ordersCount : 0;
   const profit = revenue - spend;
+  const currencyMismatch = spend > 0 && revenue > 0 && spendCurrency !== revenueCurrency;
 
   const funnel = {
     clicks: clicksCount,
@@ -98,6 +103,7 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
   res.json({
     range: { since, until },
     totals: { revenue, spend, ordersCount, clicksCount, roas, cpa, avgTicket, profit },
+    currencies: { spend: spendCurrency, revenue: revenueCurrency, mismatch: currencyMismatch },
     series,
     topCampaigns,
     funnel,

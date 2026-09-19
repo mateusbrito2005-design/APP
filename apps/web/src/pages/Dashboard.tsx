@@ -25,6 +25,7 @@ interface SummaryResponse {
     avgTicket: number;
     profit: number;
   };
+  currencies: { spend: string; revenue: string; mismatch: boolean };
   series: { date: string; revenue: number; spend: number }[];
   topCampaigns: { name: string; spend: number; revenue: number; roas: number | null }[];
   funnel: {
@@ -120,17 +121,24 @@ export default function Dashboard() {
 
       {syncMessage && <div className="alert alert-info">{syncMessage}</div>}
       {error && <div className="alert alert-error">{error}</div>}
+      {data?.currencies.mismatch && (
+        <div className="alert alert-info">
+          Seu gasto em anúncios está em <strong>{data.currencies.spend}</strong> e suas vendas em{" "}
+          <strong>{data.currencies.revenue}</strong> — Lucro, ROAS e CPA misturam as duas moedas sem conversão, então
+          use com cautela até configurar a mesma moeda dos dois lados.
+        </div>
+      )}
 
       {loading || !data ? (
         <div className="skeleton-block" />
       ) : (
         <>
           <div className="stat-grid">
-            <StatCard label="Investimento em anúncios" value={formatCurrency(data.totals.spend)} />
-            <StatCard label="Receita" value={formatCurrency(data.totals.revenue)} tone="positive" />
+            <StatCard label="Investimento em anúncios" value={formatCurrency(data.totals.spend, data.currencies.spend)} />
+            <StatCard label="Receita" value={formatCurrency(data.totals.revenue, data.currencies.revenue)} tone="positive" />
             <StatCard
               label="Lucro"
-              value={formatCurrency(data.totals.profit)}
+              value={formatCurrency(data.totals.profit, data.currencies.revenue)}
               tone={data.totals.profit >= 0 ? "positive" : "negative"}
             />
             <StatCard
@@ -139,8 +147,8 @@ export default function Dashboard() {
               hint={data.totals.roas != null ? formatPercent(data.totals.roas) : undefined}
               tone={data.totals.roas != null && data.totals.roas >= 1 ? "positive" : "negative"}
             />
-            <StatCard label="CPA" value={data.totals.cpa != null ? formatCurrency(data.totals.cpa) : "—"} />
-            <StatCard label="Ticket médio" value={formatCurrency(data.totals.avgTicket)} />
+            <StatCard label="CPA" value={data.totals.cpa != null ? formatCurrency(data.totals.cpa, data.currencies.spend) : "—"} />
+            <StatCard label="Ticket médio" value={formatCurrency(data.totals.avgTicket, data.currencies.revenue)} />
           </div>
 
           <div className="card">
@@ -205,8 +213,8 @@ export default function Dashboard() {
                   {data.topCampaigns.map((c) => (
                     <tr key={c.name}>
                       <td>{c.name}</td>
-                      <td>{formatCurrency(c.spend)}</td>
-                      <td>{formatCurrency(c.revenue)}</td>
+                      <td>{formatCurrency(c.spend, data.currencies.spend)}</td>
+                      <td>{formatCurrency(c.revenue, data.currencies.revenue)}</td>
                       <td>
                         <span className={`pill ${c.roas != null && c.roas >= 1 ? "pill-positive" : "pill-negative"}`}>
                           {c.roas != null ? `${c.roas.toFixed(2)}x` : "—"}

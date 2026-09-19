@@ -32,6 +32,7 @@ model Integration {
   fbAccessToken String?
   fbAdAccountId String?
   fbPixelId     String?
+  fbCurrency    String?
 
   hotmartSecret        String?
   kiwifySecret         String?

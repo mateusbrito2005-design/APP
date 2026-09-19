@@ -64,7 +64,14 @@ export async function syncAdSpendForUser(userId: string, days = 30) {
   since.setDate(since.getDate() - days);
 
   const fmt = (d: Date) => d.toISOString().slice(0, 10);
-  const rows = await fetchCampaignInsights(integration.fbAccessToken, integration.fbAdAccountId, fmt(since), fmt(until));
+  const [rows, account] = await Promise.all([
+    fetchCampaignInsights(integration.fbAccessToken, integration.fbAdAccountId, fmt(since), fmt(until)),
+    testFacebookConnection(integration.fbAccessToken, integration.fbAdAccountId).catch(() => null),
+  ]);
+
+  if (account?.currency && account.currency !== integration.fbCurrency) {
+    await prisma.integration.update({ where: { userId }, data: { fbCurrency: account.currency } });
+  }
 
   for (const row of rows) {
     await prisma.adSpendDaily.upsert({
