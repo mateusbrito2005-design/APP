@@ -1,21 +1,22 @@
 :root {
-  --bg: #f5f6fa;
-  --paper: #ffffff;
-  --ink: #10151a;
-  --ink-soft: #4b5563;
-  --ink-faint: #8b93a1;
-  --line: #e6e8ee;
-  --primary: #6d28d9;
-  --primary-dark: #5b21b6;
-  --primary-light: #f3ecfd;
-  --sidebar-bg: #14101f;
-  --sidebar-line: rgba(255, 255, 255, 0.08);
-  --positive: #16a34a;
-  --positive-bg: #eafbf1;
-  --negative: #dc2626;
-  --negative-bg: #fdecec;
-  --neutral-bg: #eef0f5;
-  --shadow: 0 10px 30px -12px rgba(16, 21, 26, 0.15);
+  --bg: #0a0c12;
+  --paper: #12151e;
+  --paper-alt: #171b26;
+  --ink: #f2f3f7;
+  --ink-soft: #a4abbb;
+  --ink-faint: #676e80;
+  --line: #232838;
+  --primary: #5b6ef5;
+  --primary-dark: #4655d6;
+  --primary-light: rgba(91, 110, 245, 0.16);
+  --sidebar-bg: #070911;
+  --sidebar-line: rgba(255, 255, 255, 0.07);
+  --positive: #34d399;
+  --positive-bg: rgba(52, 211, 153, 0.14);
+  --negative: #f87171;
+  --negative-bg: rgba(248, 113, 113, 0.14);
+  --neutral-bg: #1b1f2c;
+  --shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.6);
   --radius: 14px;
 }
 
@@ -37,6 +38,7 @@ body {
   color: var(--ink);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
 }
 
 h1,
@@ -371,7 +373,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at top, #f3ecfd 0%, var(--bg) 55%);
+  background: radial-gradient(circle at top, #171b3a 0%, var(--bg) 55%);
   padding: 20px;
 }
 
@@ -530,7 +532,7 @@ button {
 .skeleton-block {
   height: 160px;
   border-radius: var(--radius);
-  background: linear-gradient(90deg, var(--neutral-bg) 25%, #f7f8fb 37%, var(--neutral-bg) 63%);
+  background: linear-gradient(90deg, var(--neutral-bg) 25%, var(--paper-alt) 37%, var(--neutral-bg) 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
 }
@@ -589,6 +591,48 @@ button {
   padding: 0;
   font-size: 0.78rem;
   word-break: break-all;
+}
+
+/* ---------- funnel ---------- */
+.funnel-track {
+  display: flex;
+  height: 170px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--neutral-bg);
+}
+
+.funnel-segment {
+  flex: 1;
+}
+
+.funnel-labels {
+  display: flex;
+  margin-top: 14px;
+}
+
+.funnel-label-col {
+  flex: 1;
+  text-align: center;
+  padding: 0 6px;
+}
+
+.funnel-value {
+  font-family: "Sora", sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.funnel-name {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.funnel-pct {
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  margin-top: 2px;
 }
 
 /* ---------- responsive ---------- */

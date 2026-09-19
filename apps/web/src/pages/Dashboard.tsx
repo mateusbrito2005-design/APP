@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { api, ApiError } from "../lib/api";
 import StatCard from "../components/StatCard";
+import FunnelChart from "../components/FunnelChart";
 import { formatCurrency, formatDateShort, formatNumber, formatPercent } from "../lib/format";
 
 interface SummaryResponse {
@@ -22,9 +23,11 @@ interface SummaryResponse {
     roas: number | null;
     cpa: number | null;
     avgTicket: number;
+    profit: number;
   };
   series: { date: string; revenue: number; spend: number }[];
   topCampaigns: { name: string; spend: number; revenue: number; roas: number | null }[];
+  funnel: { clicks: number; ordersStarted: number; ordersApproved: number };
 }
 
 const RANGE_OPTIONS = [
@@ -116,18 +119,32 @@ export default function Dashboard() {
       ) : (
         <>
           <div className="stat-grid">
-            <StatCard label="Receita" value={formatCurrency(data.totals.revenue)} tone="positive" />
             <StatCard label="Investimento em anúncios" value={formatCurrency(data.totals.spend)} />
+            <StatCard label="Receita" value={formatCurrency(data.totals.revenue)} tone="positive" />
+            <StatCard
+              label="Lucro"
+              value={formatCurrency(data.totals.profit)}
+              tone={data.totals.profit >= 0 ? "positive" : "negative"}
+            />
             <StatCard
               label="ROAS"
               value={data.totals.roas != null ? `${data.totals.roas.toFixed(2)}x` : "—"}
               hint={data.totals.roas != null ? formatPercent(data.totals.roas) : undefined}
               tone={data.totals.roas != null && data.totals.roas >= 1 ? "positive" : "negative"}
             />
-            <StatCard label="Vendas pagas" value={formatNumber(data.totals.ordersCount)} />
             <StatCard label="CPA" value={data.totals.cpa != null ? formatCurrency(data.totals.cpa) : "—"} />
             <StatCard label="Ticket médio" value={formatCurrency(data.totals.avgTicket)} />
-            <StatCard label="Cliques rastreados" value={formatNumber(data.totals.clicksCount)} />
+          </div>
+
+          <div className="card">
+            <h3>Funil de conversão</h3>
+            <FunnelChart
+              stages={[
+                { label: "Cliques", value: data.funnel.clicks },
+                { label: "Pedidos iniciados", value: data.funnel.ordersStarted },
+                { label: "Vendas aprovadas", value: data.funnel.ordersApproved },
+              ]}
+            />
           </div>
 
           <div className="card chart-card">
@@ -136,25 +153,25 @@ export default function Dashboard() {
               <AreaChart data={data.series} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#22c55e" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#34d399" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="#34d399" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="spendGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f97316" stopOpacity={0.3} />
+                    <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
                     <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={formatDateShort} tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} axisLine={false} tickLine={false} width={70} tickFormatter={(v) => formatCurrency(Number(v))} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#232838" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={formatDateShort} tick={{ fontSize: 12, fill: "#a4abbb" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: "#a4abbb" }} axisLine={false} tickLine={false} width={70} tickFormatter={(v) => formatCurrency(Number(v))} />
                 <Tooltip
                   formatter={(value: number) => formatCurrency(value)}
                   labelFormatter={(label) => formatDateShort(String(label))}
-                  contentStyle={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+                  contentStyle={{ borderRadius: 12, border: "1px solid #232838", background: "#12151e", color: "#f2f3f7" }}
                 />
                 <Legend />
-                <Area type="monotone" dataKey="revenue" name="Receita" stroke="#16a34a" fill="url(#revenueGradient)" strokeWidth={2} />
-                <Area type="monotone" dataKey="spend" name="Investimento" stroke="#ea580c" fill="url(#spendGradient)" strokeWidth={2} />
+                <Area type="monotone" dataKey="revenue" name="Receita" stroke="#34d399" fill="url(#revenueGradient)" strokeWidth={2} />
+                <Area type="monotone" dataKey="spend" name="Investimento" stroke="#f97316" fill="url(#spendGradient)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>

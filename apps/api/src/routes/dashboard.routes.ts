@@ -36,6 +36,13 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
   const roas = spend > 0 ? revenue / spend : null;
   const cpa = ordersCount > 0 && spend > 0 ? spend / ordersCount : null;
   const avgTicket = ordersCount > 0 ? revenue / ordersCount : 0;
+  const profit = revenue - spend;
+
+  const funnel = {
+    clicks: clicksCount,
+    ordersStarted: orders.length,
+    ordersApproved: paidOrders.length,
+  };
 
   const revenueByDayMap = new Map<string, number>();
   for (const o of paidOrders) {
@@ -86,9 +93,10 @@ dashboardRouter.get("/summary", async (req: AuthedRequest, res) => {
 
   res.json({
     range: { since, until },
-    totals: { revenue, spend, ordersCount, clicksCount, roas, cpa, avgTicket },
+    totals: { revenue, spend, ordersCount, clicksCount, roas, cpa, avgTicket, profit },
     series,
     topCampaigns,
+    funnel,
   });
 });
 
