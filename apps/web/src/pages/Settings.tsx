@@ -81,11 +81,15 @@ function buildTrackingSnippet(apiUrl: string, checkoutDomain: string) {
   if (!clickId) return;
 
   function sendEvent(event) {
+    // Image pixel: never blocked by CORS or by in-app browsers (Facebook,
+    // Instagram...) that throttle fetch/sendBeacon calls to third-party
+    // domains. This is the same technique ad pixels have always used.
+    var pixel = new Image();
+    pixel.src = API + "/api/tracking/pixel.gif?click_id=" + encodeURIComponent(clickId) + "&event=" + encodeURIComponent(event);
+
     var payload = JSON.stringify({ click_id: clickId, event: event });
     if (navigator.sendBeacon) {
       navigator.sendBeacon(API + "/api/tracking/event", new Blob([payload], { type: "application/json" }));
-    } else {
-      fetch(API + "/api/tracking/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true });
     }
   }
 
