@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta property="og:title" content="Mateus no CoE">
+<meta property="og:description" content="Um quiz rápido para quem está decidindo quem entra no time.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#050B1C">
+<title>Mateus no CoE</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: quadra à noite. Pílula de navegação, título gigante, cartão central de quiz. Um único visual escuro, de propósito. */
+:root{
+  color-scheme:dark;
+  --bg:#050B1C; --card:#0E1C42; --card2:#13265A; --line:#27407F; --ink:#FFFFFF; --muted:#9FB0D8;
+  --yellow:#FFD21F; --yellow-ink:#1A1400; --ok:#43E0A0;
+  --display:'Anton','Impact','Arial Narrow',sans-serif;
+  --body:'Outfit','Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font:400 17px/1.5 var(--body);background:var(--bg);
+  background-image:
+    radial-gradient(500px 380px at 12% 6%,rgba(120,160,255,.28),transparent 70%),
+    radial-gradient(520px 400px at 92% 22%,rgba(255,210,31,.14),transparent 70%),
+    linear-gradient(180deg,#07122E 0%,#050B1C 60%);
+  background-repeat:no-repeat;min-height:100%}
+.wrap{max-width:720px;margin:0 auto;padding-block:20px 80px;display:flex;flex-direction:column;gap:36px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+p{margin:0}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:1;letter-spacing:.005em;text-wrap:balance}
+h1{font-size:clamp(46px,11vw,84px);text-align:center}
+h2{font-size:clamp(30px,6.4vw,46px);text-align:center}
+h3{font-size:26px}
+.y{color:var(--yellow)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+
+/* pílula do topo */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(14,28,66,.82);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 14px;position:sticky;top:max(10px,env(safe-area-inset-top,0px));z-index:5}
+.logo{display:flex;align-items:center;gap:10px;font:400 22px/1 var(--display);letter-spacing:.04em}
+.logo i{font-style:normal;background:var(--yellow);color:var(--yellow-ink);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:18px}
+.guar{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-width:0}
+.guar svg{flex:none}
+.cta{display:inline-flex;align-items:center;gap:10px;background:var(--yellow);color:var(--yellow-ink);font:700 15px var(--body);border:0;border-radius:999px;padding:8px 8px 8px 18px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.cta span{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:rgba(26,20,0,.12)}
+.cta:hover{filter:brightness(1.06)}
+
+/* hero */
+.hero{display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:14px}
+.hero h1 .row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.avatar{display:inline-grid;place-items:center;width:clamp(78px,16vw,112px);height:clamp(36px,7vw,50px);border-radius:999px;border:2px solid var(--line);
+  background:linear-gradient(135deg,var(--card2),var(--card));font:400 clamp(18px,3.4vw,24px)/1 var(--display);color:var(--yellow);letter-spacing:.06em}
+.sub{color:var(--muted);text-align:center;max-width:46ch;font-size:18px}
+
+/* cartão */
+.shell{border:1px solid var(--line);border-radius:34px;padding:7px;background:rgba(14,28,66,.4)}
+.card{background:var(--card);border-radius:28px;padding:clamp(16px,4vw,26px);display:flex;flex-direction:column;gap:18px}
+.step{text-align:center;font:600 12.5px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.bar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--yellow);border-radius:3px;transition:width .4s}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;text-align:left;width:100%;color:var(--ink);font:inherit;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;cursor:pointer;min-height:64px;transition:border-color .15s,background .15s,transform .15s}
+.opt:hover:not(:disabled){border-color:var(--yellow);background:rgba(255,210,31,.06);transform:translateY(-1px)}
+.ico{flex:none;width:42px;height:42px;border-radius:12px;background:rgba(120,160,255,.14);display:grid;place-items:center;color:#8FB0FF}
+.ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.txt b{font-weight:600;font-size:17px}
+.txt small{color:var(--muted);font-size:14.5px}
+.radio{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.22);display:grid;place-items:center}
+.radio svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.opt[aria-pressed="true"]{border-color:var(--yellow);background:rgba(255,210,31,.1)}
+.opt[aria-pressed="true"] .radio{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.opt[aria-pressed="true"] .radio svg{opacity:1}
+.opt[aria-pressed="true"] .ico{background:var(--yellow);color:var(--yellow-ink)}
+.opt:disabled:not([aria-pressed="true"]){opacity:.45;cursor:default}
+.reply{background:rgba(255,210,31,.09);border:1px solid rgba(255,210,31,.5);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;animation:pop .35s ease-out}
+.reply .tag{font:400 15px var(--display);letter-spacing:.08em;color:var(--yellow);text-transform:uppercase}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.next{align-self:stretch;justify-content:center;padding:15px 18px;font-size:16px;border-radius:16px}
+.skip{background:none;border:0;color:var(--muted);font:500 14px var(--body);text-decoration:underline;cursor:pointer;padding:6px;align-self:center}
+
+/* resultado */
+#result{display:flex;flex-direction:column;gap:44px}
+.sec{display:flex;flex-direction:column;gap:18px}
+.lead{color:var(--muted);text-align:center;max-width:52ch;margin:0 auto;font-size:18px}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.tl li{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.tl .when{font:400 17px/1 var(--display);letter-spacing:.05em;color:var(--yellow-ink);background:var(--yellow);border-radius:999px;padding:8px 0;text-align:center;text-transform:uppercase}
+.tl b{display:block;font-size:18px}
+.tl span.d{color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.two>div{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.two ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;color:var(--muted)}
+.two li{display:flex;gap:10px}
+.two li::before{content:"";flex:none;width:8px;height:8px;margin-top:9px;border-radius:50%;background:var(--ok)}
+.two .learn li::before{background:var(--yellow)}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.plan>div{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.plan ul{margin:0;padding-left:18px;color:var(--muted);font-size:15.5px;display:flex;flex-direction:column;gap:5px}
+.final{background:var(--yellow);color:var(--yellow-ink);border-radius:28px;padding:clamp(20px,4vw,28px);display:flex;flex-direction:column;gap:12px;text-align:center;align-items:center}
+.final .wa{background:var(--yellow-ink);color:var(--yellow);white-space:normal;text-align:left}
+.final .wa span{background:rgba(255,210,31,.18)}
+.final h2{color:var(--yellow-ink);font-size:clamp(26px,5vw,36px)}
+.final p{max-width:40ch;font-weight:500}
+.contact{font-weight:700;font-size:15.5px;word-break:break-word}
+@media (max-width:640px){
+  .guar{display:none}
+  .two,.plan{grid-template-columns:1fr}
+  .tl li{grid-template-columns:1fr;gap:10px}
+  .tl .when{justify-self:start;padding:8px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="nav">
+    <div class="logo"><i>MB</i> MATEUS BRITO</div>
+    <div class="guar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#43E0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      Garantia: ninguém se arrependeu
+    </div>
+    <a class="cta" href="#quiz">Fazer o quiz <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span></a>
+  </div>
+
+  <header class="hero">
+    <h1>
+      Contrate o aprendiz que entrou
+      <span class="row"><span class="avatar">MB</span><span class="y">sem saber Excel</span></span>
+    </h1>
+    <p class="sub">Hoje ele faz VBA dentro do SAP. Responda quatro perguntinhas sobre a sua dúvida e descubra por que essa aposta é boa.</p>
+  </header>
+
+  <section id="quiz" aria-live="polite" style="scroll-margin-top:90px">
+    <div class="shell"><div class="card">
+      <div class="step" id="qcount">Pergunta 1 de 4</div>
+      <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+      <h2 id="qtext"></h2>
+      <div class="opts" id="opts"></div>
+      <div class="reply" id="reply" hidden>
+        <div class="tag">Resposta do Mateus</div>
+        <p id="replytext"></p>
+      </div>
+      <button class="cta next" id="next" type="button" hidden>Próxima</button>
+      <button class="skip" id="skip" type="button">Pular pro resultado</button>
+    </div></div>
+  </section>
+
+  <div id="result" hidden>
+    <section class="sec" style="scroll-margin-top:90px" id="res">
+      <h2>O resultado: <span class="y">já deu certo uma vez</span></h2>
+      <p class="lead">Quando entrei na Braskem, eu não sabia Excel. A equipe me deu um voto de confiança. Olha o que aconteceu com ele:</p>
+      <ol class="tl">
+        <li><span class="when">Out/2025</span><div><b>Chego sem saber Excel</b><span class="d">Jovem Aprendiz em Operações Fiscais. A equipe aposta em mim mesmo assim.</span></div></li>
+        <li><span class="when">Depois</span><div><b>Aprendo, e aprendo rápido</b><span class="d">Excel avançado, apuração de impostos, conferência e controle de documentos fiscais.</span></div></li>
+        <li><span class="when">Hoje</span><div><b>Automatizo a rotina fiscal com VBA no SAP</b><span class="d">Menos tarefa manual, menos retrabalho. A equipe não se arrependeu do voto de confiança.</span></div></li>
+        <li><span class="when">Próximo</span><div><b>O CoE</b><span class="d">RPA, Blue Prism, governança, Power BI. Mais uma vez, aprender fazendo.</span></div></li>
+      </ol>
+      <p class="lead">Quer referência? Pergunte para a equipe de Operações Fiscais.</p>
+    </section>
+
+    <section class="final">
+      <h2>Mais um voto de confiança?</h2>
+      <p>Apostaram em mim uma vez e deu certo. Ficou com alguma dúvida? Vamos conversar.</p>
+      <a class="cta wa" href="https://wa.me/5571991625252?text=Oi%20Mateus%21%20Vi%20o%20quiz%20at%C3%A9%20o%20fim%20e%20gostei%20da%20iniciativa.%20Vamos%20marcar%20uma%20conversa%3F" target="_blank" rel="noopener">Chamar o Mateus no WhatsApp <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span></a>
+    </section>
+  </div>
+</div>
+
+<script>
+var ICON={
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+ smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14c1 2 7 2 8 0M9 9h.01M15 9h.01"/>',
+ eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ loop:'<path d="M20 11a8 8 0 10-2 5.5M20 4v7h-7"/>',
+ check:'<path d="M5 12l5 5 9-10"/>'
+};
+function svg(n){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICON[n]+'</svg>'}
+var Q=[
+ {q:"O que mais te trava nessa decisão?",o:[
+  ["shield","Medo de errar na pessoa","Dois bons candidatos e uma vaga só","Respira. Eu também ficaria assim. Mas olha o histórico: entrei na Braskem sem saber Excel, a equipe apostou em mim, e hoje eu automatizo rotina fiscal com VBA no SAP. A aposta já foi testada."],
+  ["clock","Tempo de treinamento","Quem vai ensinar tudo do zero?","Eu já domino as funcionalidades básicas do SAP, conheço os processos da empresa e sei como o trabalho flui entre as áreas. O time gasta tempo só no que importa: Blue Prism e o ciclo do RPA. O resto eu já tenho."],
+  ["bolt","Falta de técnica","Será que aprende rápido?","Entrei sem Excel e cheguei em VBA integrado ao SAP. Se curva de aprendizado desse medalha, eu levava uma. Sendo sincero: Power BI ainda é básico, e por isso tenho meta de painel em 60 dias."]]},
+ {q:"Como você avalia um aprendiz na primeira semana?",o:[
+  ["chat","Pergunta demais","Todo mundo ajuda, mas cansa","Pergunto, sim. Mas só depois de pesquisar. Chego com a dúvida e com um palpite de resposta."],
+  ["eye","Some e não avisa","Já passei por isso","Eu apareço. Inclusive neste quiz, que ninguém me pediu. Dá pra dizer que sou proativo."],
+  ["bolt","Já quer mexer em tudo","Energia de sobra","Culpado. Mas mexo, documento e aviso antes. Em automação, quem não documenta cria um monstro."]]},
+ {q:"Qual dor mais atrapalha uma área de soluções?",o:[
+  ["bolt","Saber se a demanda pede robô ou não","Nem tudo é automação","Essa é a parte que eu mais gosto. Antes de automatizar eu paro pra entender o problema, porque às vezes o certo é só ajustar o fluxo numa conversa. Robô em processo ruim só faz o erro sair mais rápido."],
+  ["chat","Traduzir o processo pra quem vai construir","Tempo perdido no meio do caminho","Eu falo as duas línguas. Executo a rotina fiscal no dia a dia e sei automatizá-la em VBA no SAP. Quem constrói não precisa de mil reuniões pra me entender."],
+  ["target","Gente que sabe a ferramenta, mas não tem ideia","Falta criatividade pra resolver","Ferramenta se aprende, e eu aprendo rápido. A ideia vem do jeito que eu sempre fui: já mudei de curso, fui pra vendas e entrei na Braskem sem saber Excel, sempre inventando o caminho."]]},
+ {q:"Pra resolver problema, o que pesa mais: técnica ou criatividade?",o:[
+  ["bolt","Técnica acima de tudo","Sem base não tem solução","Técnica importa, e eu estou construindo a minha: VBA no SAP, Excel avançado, Python. Mas ferramenta sem ideia vira robô fazendo a coisa errada mais rápido."],
+  ["smile","Criatividade","Ideia boa vale mais que código","Aqui eu me sinto em casa. Cursei cinco semestres de Psicologia e migrei pra Sistemas, fui pra tráfego pago e vendas, e entrei na Braskem sem saber Excel. Em cada passo eu inventei meu caminho em vez de esperar um pronto."],
+  ["target","Os dois, claro","Pensar primeiro, ferramenta depois","Exato. Primeiro descobrir qual é o problema de verdade, depois escolher a ferramenta. O CoE vive disso, e é como eu quero trabalhar."]]}
+];
+var i=0;
+var $=function(id){return document.getElementById(id)};
+function show(){
+  var q=Q[i];
+  $('qcount').textContent='Pergunta '+(i+1)+' de '+Q.length;
+  $('prog').style.width=((i+1)/Q.length*100)+'%';
+  $('qtext').textContent=q.q; $('reply').hidden=true; $('next').hidden=true; $('skip').hidden=false;
+  var box=$('opts'); box.innerHTML='';
+  q.o.forEach(function(o,k){
+    var b=document.createElement('button'); b.type='button'; b.className='opt'; b.setAttribute('aria-pressed','false');
+    b.innerHTML='<span class="ico">'+svg(o[0])+'</span><span class="txt"><b></b><small></small></span><span class="radio">'+svg('check')+'</span>';
+    b.querySelector('b').textContent=o[1]; b.querySelector('small').textContent=o[2];
+    b.onclick=function(){
+      Array.prototype.forEach.call(box.children,function(c,j){
+        c.setAttribute('aria-pressed',j===k?'true':'false'); c.disabled=true;
+      });
+      $('replytext').textContent=o[3]; $('reply').hidden=false;
+      $('next').textContent=i===Q.length-1?'Ver o resultado':'Próxima';
+      $('next').hidden=false; $('skip').hidden=true;
+    };
+    box.appendChild(b);
+  });
+}
+function finish(){
+  $('quiz').hidden=true;
+  $('result').hidden=false;
+  $('res').scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('next').onclick=function(){ if(i<Q.length-1){i++;show()}else finish() };
+$('skip').onclick=finish;
+show();
+</script>
+
+</body>
+</html>
