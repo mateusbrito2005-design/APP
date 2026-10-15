@@ -1,219 +1,252 @@
-<title>Diagnóstico CoE</title>
+<title>Mateus no CoE</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: planilha. Coluna única de leitura, rótulos de célula (A1, B2) como estrutura real: cada bloco é uma etapa do diagnóstico. */
+/* Layout: quadra à noite. Pílula de navegação, título gigante, cartão central de quiz. Um único visual escuro, de propósito. */
 :root{
-  --bg:#F1F4F0; --surface:#FFFFFF; --ink:#13201B; --muted:#55645D; --line:#D3DBD5;
-  --accent:#107C41; --accent-ink:#FFFFFF; --hi:#F5C842; --hi-ink:#2B2200;
-  --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
-  --body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+  --bg:#050B1C; --card:#0E1C42; --card2:#13265A; --line:#27407F; --ink:#FFFFFF; --muted:#9FB0D8;
+  --yellow:#FFD21F; --yellow-ink:#1A1400; --ok:#43E0A0;
+  --display:'Anton','Impact','Arial Narrow',sans-serif;
+  --body:'Outfit','Segoe UI',system-ui,sans-serif;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0F1613; --surface:#18221D; --ink:#E8EFEA; --muted:#9DB0A6; --line:#2B3932;
-  --accent:#3FD08A; --accent-ink:#06190F; --hi:#F5C842; --hi-ink:#2B2200; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0F1613; --surface:#18221D; --ink:#E8EFEA; --muted:#9DB0A6; --line:#2B3932;
-  --accent:#3FD08A; --accent-ink:#06190F; --hi:#F5C842; --hi-ink:#2B2200; color-scheme:dark}
-
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--body);margin:0}
-.wrap{max-width:760px;margin:0 auto;padding-block:40px 72px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;flex-direction:column;gap:56px}
-h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.01em}
-h1{font-size:clamp(34px,7vw,54px);font-weight:700}
-h2{font-size:clamp(26px,4.6vw,34px);font-weight:700}
-h3{font-size:19px;font-weight:600}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font:400 17px/1.5 var(--body);background:var(--bg);
+  background-image:
+    radial-gradient(500px 380px at 12% 6%,rgba(120,160,255,.28),transparent 70%),
+    radial-gradient(520px 400px at 92% 22%,rgba(255,210,31,.14),transparent 70%),
+    linear-gradient(180deg,#07122E 0%,#050B1C 60%);
+  background-repeat:no-repeat;min-height:100%}
+.wrap{max-width:720px;margin:0 auto;padding-block:20px 80px;display:flex;flex-direction:column;gap:36px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 p{margin:0}
-.ref{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center}
-.ref b{background:var(--accent);color:var(--accent-ink);padding:4px 7px;border-radius:3px;font-weight:500}
-.lead{font-size:19px;color:var(--muted);max-width:60ch}
-mark{background:var(--hi);color:var(--hi-ink);padding:0 .2em;border-radius:2px}
-header{display:flex;flex-direction:column;gap:20px}
-.btn{font:600 16px var(--body);background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:14px 22px;cursor:pointer;align-self:flex-start;min-height:48px}
-.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
-.btn:hover{filter:brightness(1.07)}
-:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.sec{display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:400;text-transform:uppercase;line-height:1;letter-spacing:.005em;text-wrap:balance}
+h1{font-size:clamp(46px,11vw,84px);text-align:center}
+h2{font-size:clamp(30px,6.4vw,46px);text-align:center}
+h3{font-size:26px}
+.y{color:var(--yellow)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
 
-/* quiz */
-.quiz{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:clamp(18px,4vw,30px);display:flex;flex-direction:column;gap:20px}
-.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s}
+/* pílula do topo */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(14,28,66,.82);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 14px;position:sticky;top:max(10px,env(safe-area-inset-top,0px));z-index:5}
+.logo{display:flex;align-items:center;gap:10px;font:400 22px/1 var(--display);letter-spacing:.04em}
+.logo i{font-style:normal;background:var(--yellow);color:var(--yellow-ink);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:18px}
+.guar{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-width:0}
+.guar svg{flex:none}
+.cta{display:inline-flex;align-items:center;gap:10px;background:var(--yellow);color:var(--yellow-ink);font:700 15px var(--body);border:0;border-radius:999px;padding:8px 8px 8px 18px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.cta span{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:rgba(26,20,0,.12)}
+.cta:hover{filter:brightness(1.06)}
+
+/* hero */
+.hero{display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:14px}
+.hero h1 .row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.avatar{display:inline-grid;place-items:center;width:clamp(78px,16vw,112px);height:clamp(36px,7vw,50px);border-radius:999px;border:2px solid var(--line);
+  background:linear-gradient(135deg,var(--card2),var(--card));font:400 clamp(18px,3.4vw,24px)/1 var(--display);color:var(--yellow);letter-spacing:.06em}
+.sub{color:var(--muted);text-align:center;max-width:46ch;font-size:18px}
+
+/* cartão */
+.shell{border:1px solid var(--line);border-radius:34px;padding:7px;background:rgba(14,28,66,.4)}
+.card{background:var(--card);border-radius:28px;padding:clamp(16px,4vw,26px);display:flex;flex-direction:column;gap:18px}
+.step{text-align:center;font:600 12.5px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.bar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--yellow);border-radius:3px;transition:width .4s}
 .opts{display:flex;flex-direction:column;gap:10px}
-.opt{font:500 16px/1.4 var(--body);text-align:left;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:14px 16px;cursor:pointer;min-height:48px}
-.opt:hover{border-color:var(--accent)}
-.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
-.opt:disabled:not([aria-pressed="true"]){opacity:.55;cursor:default}
-.reply{border-left:4px solid var(--hi);padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:6px}
-.reply .ref{color:var(--ink)}
-.skip{background:none;border:0;color:var(--muted);font:500 14px var(--body);text-decoration:underline;cursor:pointer;padding:6px 0;align-self:flex-start}
+.opt{display:flex;align-items:center;gap:14px;text-align:left;width:100%;color:var(--ink);font:inherit;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;cursor:pointer;min-height:64px;transition:border-color .15s,background .15s,transform .15s}
+.opt:hover:not(:disabled){border-color:var(--yellow);background:rgba(255,210,31,.06);transform:translateY(-1px)}
+.ico{flex:none;width:42px;height:42px;border-radius:12px;background:rgba(120,160,255,.14);display:grid;place-items:center;color:#8FB0FF}
+.ico svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.txt b{font-weight:600;font-size:17px}
+.txt small{color:var(--muted);font-size:14.5px}
+.radio{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.22);display:grid;place-items:center}
+.radio svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.opt[aria-pressed="true"]{border-color:var(--yellow);background:rgba(255,210,31,.1)}
+.opt[aria-pressed="true"] .radio{background:var(--yellow);border-color:var(--yellow);color:var(--yellow-ink)}
+.opt[aria-pressed="true"] .radio svg{opacity:1}
+.opt[aria-pressed="true"] .ico{background:var(--yellow);color:var(--yellow-ink)}
+.opt:disabled:not([aria-pressed="true"]){opacity:.45;cursor:default}
+.reply{background:rgba(255,210,31,.09);border:1px solid rgba(255,210,31,.5);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px;animation:pop .35s ease-out}
+.reply .tag{font:400 15px var(--display);letter-spacing:.08em;color:var(--yellow);text-transform:uppercase}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.next{align-self:stretch;justify-content:center;padding:15px 18px;font-size:16px;border-radius:16px}
+.skip{background:none;border:0;color:var(--muted);font:500 14px var(--body);text-decoration:underline;cursor:pointer;padding:6px;align-self:center}
 
 /* resultado */
-#result{display:flex;flex-direction:column;gap:56px}
-.tbl{overflow-x:auto;border:1.5px solid var(--line);border-radius:10px;background:var(--surface)}
-table{border-collapse:collapse;width:100%;min-width:560px;font-size:15.5px}
-th,td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
-tr:last-child td{border-bottom:0}
-th{font:500 12px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-td:first-child{font-weight:600}
-td.me,th.me{background:color-mix(in srgb,var(--accent) 11%,transparent)}
-th.me{color:var(--accent)}
-.calc{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:clamp(18px,4vw,28px);display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
-.calc>*{min-width:0}
-.f{display:flex;flex-direction:column;gap:14px}
-.f label{display:flex;justify-content:space-between;gap:12px;font-size:15px;color:var(--muted)}
-.f output{font:500 14px var(--mono);color:var(--ink)}
-.f input[type=range]{width:100%;accent-color:var(--accent)}
-.big{font:700 clamp(44px,9vw,68px)/1 var(--display);color:var(--accent);font-variant-numeric:tabular-nums}
-.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.plan>div{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.plan ul{margin:0;padding-left:18px;color:var(--muted);font-size:15.5px;display:flex;flex-direction:column;gap:6px}
-.close{background:var(--ink);color:var(--bg);border-radius:10px;padding:clamp(22px,5vw,38px);display:flex;flex-direction:column;gap:14px}
-.close .lead{color:inherit;opacity:.8}
-small{color:var(--muted);font-size:13.5px}
-@media (max-width:640px){.calc,.plan{grid-template-columns:1fr}}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+#result{display:flex;flex-direction:column;gap:44px}
+.sec{display:flex;flex-direction:column;gap:18px}
+.lead{color:var(--muted);text-align:center;max-width:52ch;margin:0 auto;font-size:18px}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.tl li{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.tl .when{font:400 17px/1 var(--display);letter-spacing:.05em;color:var(--yellow-ink);background:var(--yellow);border-radius:999px;padding:8px 0;text-align:center;text-transform:uppercase}
+.tl b{display:block;font-size:18px}
+.tl span.d{color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.two>div{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.two ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;color:var(--muted)}
+.two li{display:flex;gap:10px}
+.two li::before{content:"";flex:none;width:8px;height:8px;margin-top:9px;border-radius:50%;background:var(--ok)}
+.two .learn li::before{background:var(--yellow)}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.plan>div{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.plan ul{margin:0;padding-left:18px;color:var(--muted);font-size:15.5px;display:flex;flex-direction:column;gap:5px}
+.final{background:var(--yellow);color:var(--yellow-ink);border-radius:28px;padding:clamp(22px,5vw,38px);display:flex;flex-direction:column;gap:12px;text-align:center;align-items:center}
+.final h2{color:var(--yellow-ink)}
+.final p{max-width:46ch;font-weight:500}
+.contact{font-weight:700;font-size:15.5px;word-break:break-word}
+@media (max-width:640px){
+  .guar{display:none}
+  .two,.plan{grid-template-columns:1fr}
+  .tl li{grid-template-columns:1fr;gap:10px}
+  .tl .when{justify-self:start;padding:8px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 
 <div class="wrap">
-  <header>
-    <div class="ref"><b>A1</b> Para o gestor do CoE · Soluções em Serviços</div>
-    <h1>Duas boas opções. Uma dúvida real. <mark>Deixa eu ajudar a resolver.</mark></h1>
-    <p class="lead">Quem decide entre alguém que já conhece a casa e alguém com mais bagagem técnica quase nunca tem medo de errar na pessoa. Tem medo de errar no custo: meses de time treinando para descobrir se deu certo. Respondi quatro perguntas sobre isso do ponto de vista de quem decide. Responda também. Leva um minuto.</p>
-    <div class="row">
-      <a class="btn" href="#quiz" style="text-decoration:none;display:inline-flex;align-items:center">Começar o diagnóstico</a>
-      <button class="skip" id="skip" type="button">Ir direto ao resultado</button>
+  <div class="nav">
+    <div class="logo"><i>MB</i> MATEUS BRITO</div>
+    <div class="guar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#43E0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      Garantia: ninguém se arrependeu
     </div>
+    <a class="cta" href="#quiz">Fazer o quiz <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span></a>
+  </div>
+
+  <header class="hero">
+    <h1>
+      Contrate o aprendiz que entrou
+      <span class="row"><span class="avatar">MB</span><span class="y">sem saber Excel</span></span>
+    </h1>
+    <p class="sub">Hoje ele faz VBA dentro do SAP. Responda quatro perguntinhas sobre a sua dúvida e descubra por que essa aposta é boa.</p>
   </header>
 
-  <section class="sec" id="quiz" aria-live="polite">
-    <div class="ref"><b id="qref">B1</b> <span id="qcount">Pergunta 1 de 4</span></div>
-    <div class="quiz">
+  <section id="quiz" aria-live="polite" style="scroll-margin-top:90px">
+    <div class="shell"><div class="card">
+      <div class="step" id="qcount">Pergunta 1 de 4</div>
       <div class="bar" aria-hidden="true"><i id="prog"></i></div>
       <h2 id="qtext"></h2>
       <div class="opts" id="opts"></div>
       <div class="reply" id="reply" hidden>
-        <div class="ref">Minha resposta</div>
+        <div class="tag">Resposta do Mateus</div>
         <p id="replytext"></p>
       </div>
-      <button class="btn" id="next" type="button" hidden>Próxima</button>
-    </div>
+      <button class="cta next" id="next" type="button" hidden>Próxima</button>
+      <button class="skip" id="skip" type="button">Pular pro resultado</button>
+    </div></div>
   </section>
 
   <div id="result" hidden>
-    <section class="sec">
-      <div class="ref"><b>C1</b> Diagnóstico</div>
-      <h2>Você não precisa escolher entre quem conhece a casa e quem sabe automatizar.</h2>
-      <p class="lead">O risco de contratar alguém de fora é o time pagar duas rampas ao mesmo tempo: a da técnica e a da empresa. O risco de manter alguém de dentro é faltar técnica. No meu caso a segunda lacuna é pequena e tem prazo para fechar. A primeira não existe.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>O que pesa</th><th>Perfil de fora, mais técnico</th><th class="me">Eu</th></tr></thead>
-        <tbody>
-          <tr><td>Contexto da empresa</td><td>Aprender SAP, processos, áreas e pessoas</td><td class="me">Já tenho</td></tr>
-          <tr><td>Automação</td><td>Mais profundidade inicial</td><td class="me">VBA integrado ao SAP em rotinas fiscais, desde out/2025. Python básico</td></tr>
-          <tr><td>Power BI</td><td>Provavelmente mais avançado</td><td class="me">Conhecimento básico hoje. Meta: um painel do CoE entregue até o 60º dia</td></tr>
-          <tr><td>Tempo do time para treinar</td><td>Duas frentes: técnica e empresa</td><td class="me">Uma frente: ferramentas do CoE (Blue Prism, ciclo do RPA, ServiceNow)</td></tr>
-          <tr><td>Inglês e comunicação</td><td>Varia de pessoa para pessoa</td><td class="me">Inglês avançado. Atendi clientes, prospectei e fechei vendas</td></tr>
-          <tr><td>Risco de adaptação</td><td>Cultura, ritmo e relações novos</td><td class="me">Já adaptado</td></tr>
-        </tbody>
-      </table></div>
-      <small>Sobre Power BI: prefiro dizer onde estou a prometer o que ainda não entreguei. Por isso o plano abaixo tem datas.</small>
+    <section class="sec" style="scroll-margin-top:90px" id="res">
+      <h2>O resultado: <span class="y">já deu certo uma vez</span></h2>
+      <p class="lead">Quando entrei na Braskem, eu não sabia Excel. A equipe me deu um voto de confiança. Olha o que aconteceu com ele:</p>
+      <ol class="tl">
+        <li><span class="when">Out/2025</span><div><b>Chego sem saber Excel</b><span class="d">Jovem Aprendiz em Operações Fiscais. A equipe aposta em mim mesmo assim.</span></div></li>
+        <li><span class="when">Depois</span><div><b>Aprendo, e aprendo rápido</b><span class="d">Excel avançado, apuração de impostos, conferência e controle de documentos fiscais.</span></div></li>
+        <li><span class="when">Hoje</span><div><b>Automatizo a rotina fiscal com VBA no SAP</b><span class="d">Menos tarefa manual, menos retrabalho. A equipe não se arrependeu do voto de confiança.</span></div></li>
+        <li><span class="when">Próximo</span><div><b>O CoE</b><span class="d">RPA, Blue Prism, governança, Power BI. Mais uma vez, aprender fazendo.</span></div></li>
+      </ol>
+      <p class="lead">Quer referência? Pergunte para a equipe de Operações Fiscais.</p>
     </section>
 
     <section class="sec">
-      <div class="ref"><b>D1</b> Ordem de grandeza</div>
-      <h2>O que uma automação devolve para o time</h2>
-      <p class="lead">Ajuste os números para uma tarefa manual real do CoE. Os valores iniciais são um exemplo.</p>
-      <div class="calc">
-        <div class="f">
-          <div><label for="c1">Execuções por semana <output id="o1"></output></label><input id="c1" type="range" min="1" max="100" value="20"></div>
-          <div><label for="c2">Minutos por execução <output id="o2"></output></label><input id="c2" type="range" min="1" max="120" value="15"></div>
-          <div><label for="c3">Parte automatizada <output id="o3"></output></label><input id="c3" type="range" min="10" max="100" value="90"></div>
-        </div>
-        <div>
-          <div class="big" id="hours">0</div>
-          <p>horas por ano devolvidas ao time com uma única automação. Considerando 46 semanas úteis.</p>
-        </div>
+      <h2>Sem enrolação</h2>
+      <div class="two">
+        <div><h3 class="y">Já trago</h3><ul>
+          <li>Conheço a Braskem, o SAP e as pessoas</li>
+          <li>VBA integrado ao SAP, com processo real</li>
+          <li>Excel avançado e Python básico</li>
+          <li>Inglês avançado</li>
+          <li>Experiência em vendas, atendimento e relatórios de KPI</li></ul></div>
+        <div class="learn"><h3 class="y">Vou aprender</h3><ul>
+          <li>Blue Prism e o ciclo de vida completo do RPA</li>
+          <li>Power BI além do básico. Meta: um painel do CoE em 60 dias</li>
+          <li>Power Automate, Power Apps e ServiceNow</li>
+          <li>Governança das automações</li></ul></div>
       </div>
     </section>
 
     <section class="sec">
-      <div class="ref"><b>E1</b> Proposta</div>
       <h2>Meus primeiros 90 dias</h2>
       <div class="plan">
-        <div><h3>Dias 1 a 30</h3><ul><li>Mapear o portfólio de robôs e a governança do CoE</li><li>Aprender o ciclo de vida do RPA e o Blue Prism</li><li>Entregar uma automação pequena e documentada</li></ul></div>
-        <div><h3>Dias 31 a 60</h3><ul><li>Construir um painel de indicadores do CoE em Power BI</li><li>Entrar na rotina da Central de Atendimento e do ServiceNow</li></ul></div>
-        <div><h3>Dias 61 a 90</h3><ul><li>Fazer ajustes em Power Apps e Power Automate com autonomia</li><li>Assumir uma rotina de governança</li><li>Apoiar demandas administrativas sem tirar tempo de ninguém</li></ul></div>
+        <div><h3>Dias 1 a 30</h3><ul><li>Entender o portfólio de robôs e a governança</li><li>Aprender o ciclo do RPA e o Blue Prism</li><li>Entregar uma automação pequena e documentada</li></ul></div>
+        <div><h3>Dias 31 a 60</h3><ul><li>Painel de indicadores do CoE em Power BI</li><li>Entrar na rotina da Central de Atendimento</li></ul></div>
+        <div><h3>Dias 61 a 90</h3><ul><li>Ajustes em Power Apps e Power Automate com autonomia</li><li>Assumir uma rotina de governança</li><li>Ajudar nas demandas administrativas</li></ul></div>
       </div>
     </section>
 
-    <section class="close">
-      <h2>Eu já vendi para clientes e sei como isso funciona.</h2>
-      <p class="lead">Primeiro entender a dor de quem decide, depois apresentar a solução, depois deixar claro o que acontece se der certo. A sua dor é pagar rampa dupla e ficar na dúvida. Sou aprendiz em Operações Fiscais, ou seja, já fui cliente das automações que o CoE entrega. Sei como é a dor do outro lado. A solução sou eu, com datas e entregas que você pode cobrar.</p>
-      <p class="lead">Mateus Brito de Oliveira Silva · Jovem Aprendiz, Operações Fiscais · Salvador/BA · mateusbrito2005@gmail.com · (71) 99162-5252</p>
-      <p class="lead">Obrigado pelo tempo e pela conversa. Fico à disposição para qualquer pergunta.</p>
+    <section class="final">
+      <h2>Mais um voto de confiança?</h2>
+      <p>Eu já vendi para clientes e sei fechar. Então vou direto: apostaram em mim uma vez e deu certo. Aposte de novo e eu cobro de mim as entregas acima.</p>
+      <p class="contact">Mateus Brito · Salvador/BA<br>mateusbrito2005@gmail.com · (71) 99162-5252</p>
     </section>
   </div>
 </div>
 
 <script>
+var ICON={
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+ smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14c1 2 7 2 8 0M9 9h.01M15 9h.01"/>',
+ eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ loop:'<path d="M20 11a8 8 0 10-2 5.5M20 4v7h-7"/>',
+ check:'<path d="M5 12l5 5 9-10"/>'
+};
+function svg(n){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICON[n]+'</svg>'}
 var Q=[
- {q:"Se a pessoa contratada precisa render sozinha, qual prazo você tolera?",o:[
-  ["Até 30 dias","Esse é o meu caso mais forte. Já uso o SAP todo dia, conheço a empresa e as pessoas. O que falta é o que a vaga ensina: Blue Prism e o ciclo do RPA, e isso eu aprendo em cima de uma base que já existe."],
-  ["Até 90 dias","Em 90 dias eu entrego mais do que acompanho: uma automação pequena no primeiro mês e um painel no terceiro. Está no plano abaixo, com datas."],
-  ["Não tenho pressa, quero o mais forte tecnicamente","Faz sentido. Mas em início de carreira, o que separa quem rende de quem trava é velocidade de aprendizado e contexto. Contexto eu já tenho, e a técnica eu venho construindo com VBA em SAP."]]},
- {q:"Qual parte da vaga mais preocupa você?",o:[
-  ["Construir automações","Hoje eu desenvolvo automações em VBA integradas ao SAP nas rotinas fiscais, para reduzir tarefa manual e retrabalho. É automação real, num sistema que a empresa usa todo dia. Python, Power Automate e Blue Prism mudam a ferramenta. A lógica continua a mesma."],
-  ["Indicadores e Power BI","Tenho conhecimento básico em Power BI e digo isso sem rodeio. Em compensação, já montei relatórios de desempenho e acompanhei KPIs com clientes, então sei qual indicador importa. A meta é concreta: um painel real do CoE até o 60º dia."],
-  ["Central de Atendimento e demandas administrativas","Aqui eu já ando sozinho. Conheço a empresa por dentro e já fiz atendimento ao cliente e apoio administrativo em empregos anteriores. Isso tira peso do time."]]},
- {q:"Qual contratação sai mais cara para o time?",o:[
-  ["Quem escreve código sem entender o processo","Robô que não conhece o processo quebra no primeiro caso fora do padrão. Eu automatizo a rotina fiscal que eu mesmo executo, então sei onde ela foge do padrão."],
-  ["Quem entende o processo, mas não sabe automatizar","Por isso o VBA em SAP importa: eu apuro e confiro documentos fiscais e também automatizo essa rotina. Os dois lados estão na mesma pessoa."],
-  ["Quem precisa de supervisão o tempo todo","Autonomia é o que eu vendo. Chego com a pergunta já pesquisada e com uma proposta de solução, não só com o problema."]]},
- {q:"Daqui a seis meses, como você vai saber que acertou?",o:[
-  ["Entregas no portfólio de automações","Cada etapa do meu plano termina em algo que você consegue abrir e conferir: automação, painel, rotina."],
-  ["O time com menos trabalho manual","É a conta da calculadora abaixo. Uma automação bem escolhida já devolve centenas de horas por ano."],
-  ["Alguém pronto para crescer na área","Eu fico para aprender a área inteira, do RPA à governança. Rampa curta hoje vira retorno mais longo depois."]]}
+ {q:"O que mais te trava nessa decisão?",o:[
+  ["shield","Medo de errar na pessoa","Dois bons candidatos e uma vaga só","Respira. Eu também ficaria assim. Mas olha o histórico: entrei na Braskem sem saber Excel, a equipe apostou em mim, e hoje eu automatizo rotina fiscal com VBA no SAP. A aposta já foi testada."],
+  ["clock","Tempo de treinamento","Quem vai ensinar tudo do zero?","Eu já sei onde fica o SAP, quem aprova o quê e como a casa funciona. O time gasta tempo só no que importa: Blue Prism e o ciclo do RPA. O resto eu já tenho."],
+  ["bolt","Falta de técnica","Será que aprende rápido?","Entrei sem Excel e cheguei em VBA integrado ao SAP. Se curva de aprendizado desse medalha, eu levava uma. Sendo sincero: Power BI ainda é básico, e por isso tenho meta de painel em 60 dias."]]},
+ {q:"Como você avalia um aprendiz na primeira semana?",o:[
+  ["chat","Pergunta demais","Todo mundo ajuda, mas cansa","Pergunto, sim. Mas só depois de pesquisar. Chego com a dúvida e com um palpite de resposta."],
+  ["eye","Some e não avisa","Já passei por isso","Eu apareço. Inclusive neste quiz, que ninguém me pediu. Dá pra dizer que sou proativo."],
+  ["bolt","Já quer mexer em tudo","Energia de sobra","Culpado. Mas mexo, documento e aviso antes. Em automação, quem não documenta cria um monstro."]]},
+ {q:"O robô quebrou. O que você espera de quem cuida dele?",o:[
+  ["target","Que entenda o processo","Pra saber onde ele escorrega","Esse sou eu. Eu executo a rotina fiscal e também a automatizo. Sei onde ela foge do padrão porque já caí nela."],
+  ["loop","Que conserte e não repita","Errou uma vez, aprendeu","Erro uma vez, anoto e automatizo pra não repetir. Aliás, isso é quase a definição de RPA."],
+  ["chat","Que avise rápido","Sem surpresa na segunda","Aviso na hora, com causa provável e proposta de correção. Ninguém gosta de descobrir o problema pelo cliente."]]},
+ {q:"No fim das contas, o que vale mais num aprendiz?",o:[
+  ["smile","Vontade de aprender","Quem quer, chega lá","Aqui eu ganho. Entrei sem Excel e hoje faço VBA. Vontade eu tenho de sobra, e a equipe que me deu o voto de confiança pode confirmar."],
+  ["shield","Conhecer a empresa","Contexto não se compra","Contexto leva meses pra aprender. Eu já tenho, e o time ganha esse tempo de volta."],
+  ["clock","Já chegar pronto","Sem precisar de rampa","Ninguém chega pronto, porque o CoE tem ferramentas próprias, como o Blue Prism. Eu chego rápido e esforçado, e isso eu já provei uma vez."]]}
 ];
-var i=0, picked=-1;
+var i=0;
 var $=function(id){return document.getElementById(id)};
 function show(){
-  var q=Q[i]; picked=-1;
-  $('qref').textContent='B'+(i+1); $('qcount').textContent='Pergunta '+(i+1)+' de '+Q.length;
-  $('prog').style.width=(i/Q.length*100)+'%';
-  $('qtext').textContent=q.q; $('reply').hidden=true; $('next').hidden=true;
+  var q=Q[i];
+  $('qcount').textContent='Pergunta '+(i+1)+' de '+Q.length;
+  $('prog').style.width=((i+1)/Q.length*100)+'%';
+  $('qtext').textContent=q.q; $('reply').hidden=true; $('next').hidden=true; $('skip').hidden=false;
   var box=$('opts'); box.innerHTML='';
   q.o.forEach(function(o,k){
-    var b=document.createElement('button'); b.type='button'; b.className='opt'; b.textContent=o[0];
-    b.setAttribute('aria-pressed','false');
+    var b=document.createElement('button'); b.type='button'; b.className='opt'; b.setAttribute('aria-pressed','false');
+    b.innerHTML='<span class="ico">'+svg(o[0])+'</span><span class="txt"><b></b><small></small></span><span class="radio">'+svg('check')+'</span>';
+    b.querySelector('b').textContent=o[1]; b.querySelector('small').textContent=o[2];
     b.onclick=function(){
-      picked=k;
-      Array.prototype.forEach.call(box.children,function(c,j){c.setAttribute('aria-pressed',j===k?'true':'false');c.disabled=true});
-      $('replytext').textContent=o[1]; $('reply').hidden=false;
-      $('next').textContent=i===Q.length-1?'Ver o diagnóstico':'Próxima'; $('next').hidden=false;
-      $('next').focus({preventScroll:true});
+      Array.prototype.forEach.call(box.children,function(c,j){
+        c.setAttribute('aria-pressed',j===k?'true':'false'); c.disabled=true;
+      });
+      $('replytext').textContent=o[3]; $('reply').hidden=false;
+      $('next').textContent=i===Q.length-1?'Ver o resultado':'Próxima';
+      $('next').hidden=false; $('skip').hidden=true;
     };
     box.appendChild(b);
   });
 }
 function finish(){
-  $('prog').style.width='100%';
-  $('quiz').style.display='none';
-  var r=$('result'); r.hidden=false;
-  r.scrollIntoView({behavior:'smooth',block:'start'});
+  $('quiz').hidden=true;
+  $('result').hidden=false;
+  $('res').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('next').onclick=function(){ if(i<Q.length-1){i++;show()}else finish() };
 $('skip').onclick=finish;
-function calc(){
-  var a=+$('c1').value,b=+$('c2').value,c=+$('c3').value;
-  $('o1').textContent=a; $('o2').textContent=b+' min'; $('o3').textContent=c+'%';
-  $('hours').textContent=Math.round(a*b*(c/100)*46/60).toLocaleString('pt-BR');
-}
-['c1','c2','c3'].forEach(function(id){$(id).addEventListener('input',calc)});
-calc(); show();
+show();
 </script>
