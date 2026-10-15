@@ -1,0 +1,219 @@
+<title>Diagnóstico CoE</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: planilha. Coluna única de leitura, rótulos de célula (A1, B2) como estrutura real: cada bloco é uma etapa do diagnóstico. */
+:root{
+  --bg:#F1F4F0; --surface:#FFFFFF; --ink:#13201B; --muted:#55645D; --line:#D3DBD5;
+  --accent:#107C41; --accent-ink:#FFFFFF; --hi:#F5C842; --hi-ink:#2B2200;
+  --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1613; --surface:#18221D; --ink:#E8EFEA; --muted:#9DB0A6; --line:#2B3932;
+  --accent:#3FD08A; --accent-ink:#06190F; --hi:#F5C842; --hi-ink:#2B2200; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1613; --surface:#18221D; --ink:#E8EFEA; --muted:#9DB0A6; --line:#2B3932;
+  --accent:#3FD08A; --accent-ink:#06190F; --hi:#F5C842; --hi-ink:#2B2200; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--body);margin:0}
+.wrap{max-width:760px;margin:0 auto;padding-block:40px 72px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(34px,7vw,54px);font-weight:700}
+h2{font-size:clamp(26px,4.6vw,34px);font-weight:700}
+h3{font-size:19px;font-weight:600}
+p{margin:0}
+.ref{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center}
+.ref b{background:var(--accent);color:var(--accent-ink);padding:4px 7px;border-radius:3px;font-weight:500}
+.lead{font-size:19px;color:var(--muted);max-width:60ch}
+mark{background:var(--hi);color:var(--hi-ink);padding:0 .2em;border-radius:2px}
+header{display:flex;flex-direction:column;gap:20px}
+.btn{font:600 16px var(--body);background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:14px 22px;cursor:pointer;align-self:flex-start;min-height:48px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:hover{filter:brightness(1.07)}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.sec{display:flex;flex-direction:column;gap:20px}
+
+/* quiz */
+.quiz{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:clamp(18px,4vw,30px);display:flex;flex-direction:column;gap:20px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .35s}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{font:500 16px/1.4 var(--body);text-align:left;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:14px 16px;cursor:pointer;min-height:48px}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.opt:disabled:not([aria-pressed="true"]){opacity:.55;cursor:default}
+.reply{border-left:4px solid var(--hi);padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:6px}
+.reply .ref{color:var(--ink)}
+.skip{background:none;border:0;color:var(--muted);font:500 14px var(--body);text-decoration:underline;cursor:pointer;padding:6px 0;align-self:flex-start}
+
+/* resultado */
+#result{display:flex;flex-direction:column;gap:56px}
+.tbl{overflow-x:auto;border:1.5px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:15.5px}
+th,td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font:500 12px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+td:first-child{font-weight:600}
+td.me,th.me{background:color-mix(in srgb,var(--accent) 11%,transparent)}
+th.me{color:var(--accent)}
+.calc{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:clamp(18px,4vw,28px);display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+.calc>*{min-width:0}
+.f{display:flex;flex-direction:column;gap:14px}
+.f label{display:flex;justify-content:space-between;gap:12px;font-size:15px;color:var(--muted)}
+.f output{font:500 14px var(--mono);color:var(--ink)}
+.f input[type=range]{width:100%;accent-color:var(--accent)}
+.big{font:700 clamp(44px,9vw,68px)/1 var(--display);color:var(--accent);font-variant-numeric:tabular-nums}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.plan>div{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.plan ul{margin:0;padding-left:18px;color:var(--muted);font-size:15.5px;display:flex;flex-direction:column;gap:6px}
+.close{background:var(--ink);color:var(--bg);border-radius:10px;padding:clamp(22px,5vw,38px);display:flex;flex-direction:column;gap:14px}
+.close .lead{color:inherit;opacity:.8}
+small{color:var(--muted);font-size:13.5px}
+@media (max-width:640px){.calc,.plan{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="ref"><b>A1</b> Para o gestor do CoE · Soluções em Serviços</div>
+    <h1>Duas boas opções. Uma dúvida real. <mark>Deixa eu ajudar a resolver.</mark></h1>
+    <p class="lead">Quem decide entre alguém que já conhece a casa e alguém com mais bagagem técnica quase nunca tem medo de errar na pessoa. Tem medo de errar no custo: meses de time treinando para descobrir se deu certo. Respondi quatro perguntas sobre isso do ponto de vista de quem decide. Responda também. Leva um minuto.</p>
+    <div class="row">
+      <a class="btn" href="#quiz" style="text-decoration:none;display:inline-flex;align-items:center">Começar o diagnóstico</a>
+      <button class="skip" id="skip" type="button">Ir direto ao resultado</button>
+    </div>
+  </header>
+
+  <section class="sec" id="quiz" aria-live="polite">
+    <div class="ref"><b id="qref">B1</b> <span id="qcount">Pergunta 1 de 4</span></div>
+    <div class="quiz">
+      <div class="bar" aria-hidden="true"><i id="prog"></i></div>
+      <h2 id="qtext"></h2>
+      <div class="opts" id="opts"></div>
+      <div class="reply" id="reply" hidden>
+        <div class="ref">Minha resposta</div>
+        <p id="replytext"></p>
+      </div>
+      <button class="btn" id="next" type="button" hidden>Próxima</button>
+    </div>
+  </section>
+
+  <div id="result" hidden>
+    <section class="sec">
+      <div class="ref"><b>C1</b> Diagnóstico</div>
+      <h2>Você não precisa escolher entre quem conhece a casa e quem sabe automatizar.</h2>
+      <p class="lead">O risco de contratar alguém de fora é o time pagar duas rampas ao mesmo tempo: a da técnica e a da empresa. O risco de manter alguém de dentro é faltar técnica. No meu caso a segunda lacuna é pequena e tem prazo para fechar. A primeira não existe.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>O que pesa</th><th>Perfil de fora, mais técnico</th><th class="me">Eu</th></tr></thead>
+        <tbody>
+          <tr><td>Contexto da empresa</td><td>Aprender SAP, processos, áreas e pessoas</td><td class="me">Já tenho</td></tr>
+          <tr><td>Automação</td><td>Mais profundidade inicial</td><td class="me">VBA integrado ao SAP em rotinas fiscais, desde out/2025. Python básico</td></tr>
+          <tr><td>Power BI</td><td>Provavelmente mais avançado</td><td class="me">Conhecimento básico hoje. Meta: um painel do CoE entregue até o 60º dia</td></tr>
+          <tr><td>Tempo do time para treinar</td><td>Duas frentes: técnica e empresa</td><td class="me">Uma frente: ferramentas do CoE (Blue Prism, ciclo do RPA, ServiceNow)</td></tr>
+          <tr><td>Inglês e comunicação</td><td>Varia de pessoa para pessoa</td><td class="me">Inglês avançado. Atendi clientes, prospectei e fechei vendas</td></tr>
+          <tr><td>Risco de adaptação</td><td>Cultura, ritmo e relações novos</td><td class="me">Já adaptado</td></tr>
+        </tbody>
+      </table></div>
+      <small>Sobre Power BI: prefiro dizer onde estou a prometer o que ainda não entreguei. Por isso o plano abaixo tem datas.</small>
+    </section>
+
+    <section class="sec">
+      <div class="ref"><b>D1</b> Ordem de grandeza</div>
+      <h2>O que uma automação devolve para o time</h2>
+      <p class="lead">Ajuste os números para uma tarefa manual real do CoE. Os valores iniciais são um exemplo.</p>
+      <div class="calc">
+        <div class="f">
+          <div><label for="c1">Execuções por semana <output id="o1"></output></label><input id="c1" type="range" min="1" max="100" value="20"></div>
+          <div><label for="c2">Minutos por execução <output id="o2"></output></label><input id="c2" type="range" min="1" max="120" value="15"></div>
+          <div><label for="c3">Parte automatizada <output id="o3"></output></label><input id="c3" type="range" min="10" max="100" value="90"></div>
+        </div>
+        <div>
+          <div class="big" id="hours">0</div>
+          <p>horas por ano devolvidas ao time com uma única automação. Considerando 46 semanas úteis.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="ref"><b>E1</b> Proposta</div>
+      <h2>Meus primeiros 90 dias</h2>
+      <div class="plan">
+        <div><h3>Dias 1 a 30</h3><ul><li>Mapear o portfólio de robôs e a governança do CoE</li><li>Aprender o ciclo de vida do RPA e o Blue Prism</li><li>Entregar uma automação pequena e documentada</li></ul></div>
+        <div><h3>Dias 31 a 60</h3><ul><li>Construir um painel de indicadores do CoE em Power BI</li><li>Entrar na rotina da Central de Atendimento e do ServiceNow</li></ul></div>
+        <div><h3>Dias 61 a 90</h3><ul><li>Fazer ajustes em Power Apps e Power Automate com autonomia</li><li>Assumir uma rotina de governança</li><li>Apoiar demandas administrativas sem tirar tempo de ninguém</li></ul></div>
+      </div>
+    </section>
+
+    <section class="close">
+      <h2>Eu já vendi para clientes e sei como isso funciona.</h2>
+      <p class="lead">Primeiro entender a dor de quem decide, depois apresentar a solução, depois deixar claro o que acontece se der certo. A sua dor é pagar rampa dupla e ficar na dúvida. Sou aprendiz em Operações Fiscais, ou seja, já fui cliente das automações que o CoE entrega. Sei como é a dor do outro lado. A solução sou eu, com datas e entregas que você pode cobrar.</p>
+      <p class="lead">Mateus Brito de Oliveira Silva · Jovem Aprendiz, Operações Fiscais · Salvador/BA · mateusbrito2005@gmail.com · (71) 99162-5252</p>
+      <p class="lead">Obrigado pelo tempo e pela conversa. Fico à disposição para qualquer pergunta.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+var Q=[
+ {q:"Se a pessoa contratada precisa render sozinha, qual prazo você tolera?",o:[
+  ["Até 30 dias","Esse é o meu caso mais forte. Já uso o SAP todo dia, conheço a empresa e as pessoas. O que falta é o que a vaga ensina: Blue Prism e o ciclo do RPA, e isso eu aprendo em cima de uma base que já existe."],
+  ["Até 90 dias","Em 90 dias eu entrego mais do que acompanho: uma automação pequena no primeiro mês e um painel no terceiro. Está no plano abaixo, com datas."],
+  ["Não tenho pressa, quero o mais forte tecnicamente","Faz sentido. Mas em início de carreira, o que separa quem rende de quem trava é velocidade de aprendizado e contexto. Contexto eu já tenho, e a técnica eu venho construindo com VBA em SAP."]]},
+ {q:"Qual parte da vaga mais preocupa você?",o:[
+  ["Construir automações","Hoje eu desenvolvo automações em VBA integradas ao SAP nas rotinas fiscais, para reduzir tarefa manual e retrabalho. É automação real, num sistema que a empresa usa todo dia. Python, Power Automate e Blue Prism mudam a ferramenta. A lógica continua a mesma."],
+  ["Indicadores e Power BI","Tenho conhecimento básico em Power BI e digo isso sem rodeio. Em compensação, já montei relatórios de desempenho e acompanhei KPIs com clientes, então sei qual indicador importa. A meta é concreta: um painel real do CoE até o 60º dia."],
+  ["Central de Atendimento e demandas administrativas","Aqui eu já ando sozinho. Conheço a empresa por dentro e já fiz atendimento ao cliente e apoio administrativo em empregos anteriores. Isso tira peso do time."]]},
+ {q:"Qual contratação sai mais cara para o time?",o:[
+  ["Quem escreve código sem entender o processo","Robô que não conhece o processo quebra no primeiro caso fora do padrão. Eu automatizo a rotina fiscal que eu mesmo executo, então sei onde ela foge do padrão."],
+  ["Quem entende o processo, mas não sabe automatizar","Por isso o VBA em SAP importa: eu apuro e confiro documentos fiscais e também automatizo essa rotina. Os dois lados estão na mesma pessoa."],
+  ["Quem precisa de supervisão o tempo todo","Autonomia é o que eu vendo. Chego com a pergunta já pesquisada e com uma proposta de solução, não só com o problema."]]},
+ {q:"Daqui a seis meses, como você vai saber que acertou?",o:[
+  ["Entregas no portfólio de automações","Cada etapa do meu plano termina em algo que você consegue abrir e conferir: automação, painel, rotina."],
+  ["O time com menos trabalho manual","É a conta da calculadora abaixo. Uma automação bem escolhida já devolve centenas de horas por ano."],
+  ["Alguém pronto para crescer na área","Eu fico para aprender a área inteira, do RPA à governança. Rampa curta hoje vira retorno mais longo depois."]]}
+];
+var i=0, picked=-1;
+var $=function(id){return document.getElementById(id)};
+function show(){
+  var q=Q[i]; picked=-1;
+  $('qref').textContent='B'+(i+1); $('qcount').textContent='Pergunta '+(i+1)+' de '+Q.length;
+  $('prog').style.width=(i/Q.length*100)+'%';
+  $('qtext').textContent=q.q; $('reply').hidden=true; $('next').hidden=true;
+  var box=$('opts'); box.innerHTML='';
+  q.o.forEach(function(o,k){
+    var b=document.createElement('button'); b.type='button'; b.className='opt'; b.textContent=o[0];
+    b.setAttribute('aria-pressed','false');
+    b.onclick=function(){
+      picked=k;
+      Array.prototype.forEach.call(box.children,function(c,j){c.setAttribute('aria-pressed',j===k?'true':'false');c.disabled=true});
+      $('replytext').textContent=o[1]; $('reply').hidden=false;
+      $('next').textContent=i===Q.length-1?'Ver o diagnóstico':'Próxima'; $('next').hidden=false;
+      $('next').focus({preventScroll:true});
+    };
+    box.appendChild(b);
+  });
+}
+function finish(){
+  $('prog').style.width='100%';
+  $('quiz').style.display='none';
+  var r=$('result'); r.hidden=false;
+  r.scrollIntoView({behavior:'smooth',block:'start'});
+}
+$('next').onclick=function(){ if(i<Q.length-1){i++;show()}else finish() };
+$('skip').onclick=finish;
+function calc(){
+  var a=+$('c1').value,b=+$('c2').value,c=+$('c3').value;
+  $('o1').textContent=a; $('o2').textContent=b+' min'; $('o3').textContent=c+'%';
+  $('hours').textContent=Math.round(a*b*(c/100)*46/60).toLocaleString('pt-BR');
+}
+['c1','c2','c3'].forEach(function(id){$(id).addEventListener('input',calc)});
+calc(); show();
+</script>
