@@ -94,9 +94,11 @@ h3{font-size:26px}
 .plan{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .plan>div{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .plan ul{margin:0;padding-left:18px;color:var(--muted);font-size:15.5px;display:flex;flex-direction:column;gap:5px}
-.final{background:var(--yellow);color:var(--yellow-ink);border-radius:28px;padding:clamp(22px,5vw,38px);display:flex;flex-direction:column;gap:12px;text-align:center;align-items:center}
-.final h2{color:var(--yellow-ink)}
-.final p{max-width:46ch;font-weight:500}
+.final{background:var(--yellow);color:var(--yellow-ink);border-radius:28px;padding:clamp(20px,4vw,28px);display:flex;flex-direction:column;gap:12px;text-align:center;align-items:center}
+.final .wa{background:var(--yellow-ink);color:var(--yellow);white-space:normal;text-align:left}
+.final .wa span{background:rgba(255,210,31,.18)}
+.final h2{color:var(--yellow-ink);font-size:clamp(26px,5vw,36px)}
+.final p{max-width:40ch;font-weight:500}
 .contact{font-weight:700;font-size:15.5px;word-break:break-word}
 @media (max-width:640px){
   .guar{display:none}
@@ -153,46 +155,10 @@ h3{font-size:26px}
       <p class="lead">Quer referência? Pergunte para a equipe de Operações Fiscais.</p>
     </section>
 
-    <section class="sec">
-      <h2>Eu já me arrisquei antes</h2>
-      <ol class="tl">
-        <li><span class="when">Psicologia</span><div><b>Mudei de rumo</b><span class="d">Cinco semestres em Psicologia, e depois fui para Análise e Desenvolvimento de Sistemas.</span></div></li>
-        <li><span class="when">Vendas</span><div><b>Fui para o campo</b><span class="d">Tráfego pago e vendas em uma agência: campanhas, leads, negociação e fechamento.</span></div></li>
-        <li><span class="when">Braskem</span><div><b>Entrei sem saber Excel</b><span class="d">Aprendi fazendo, e a equipe apostou em mim.</span></div></li>
-      </ol>
-    </section>
-
-    <section class="sec">
-      <h2>Sem enrolação</h2>
-      <div class="two">
-        <div><h3 class="y">Já trago</h3><ul>
-          <li>Conheço a Braskem, as funcionalidades básicas do SAP e as pessoas</li>
-          <li>VBA integrado ao SAP, com processo real</li>
-          <li>Excel avançado e Python básico</li>
-          <li>Inglês avançado</li>
-          <li>Criatividade para achar a solução certa, que nem sempre é um robô</li>
-          <li>Experiência em vendas, atendimento e relatórios de KPI</li></ul></div>
-        <div class="learn"><h3 class="y">Vou aprender</h3><ul>
-          <li>Blue Prism e o ciclo de vida completo do RPA</li>
-          <li>Power BI além do básico. Meta: um painel do CoE em 60 dias</li>
-          <li>Power Automate, Power Apps e ServiceNow</li>
-          <li>Governança das automações</li></ul></div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <h2>Meus primeiros 90 dias</h2>
-      <div class="plan">
-        <div><h3>Dias 1 a 30</h3><ul><li>Entender o portfólio de robôs e a governança</li><li>Descobrir quais demandas pedem um robô e quais pedem só uma conversa</li><li>Aprender o ciclo do RPA e o Blue Prism</li><li>Entregar uma automação pequena e documentada</li></ul></div>
-        <div><h3>Dias 31 a 60</h3><ul><li>Painel de indicadores do CoE em Power BI</li><li>Entrar na rotina da Central de Atendimento</li></ul></div>
-        <div><h3>Dias 61 a 90</h3><ul><li>Ajustes em Power Apps e Power Automate com autonomia</li><li>Assumir uma rotina de governança</li><li>Ajudar nas demandas administrativas</li></ul></div>
-      </div>
-    </section>
-
     <section class="final">
       <h2>Mais um voto de confiança?</h2>
-      <p>Eu já vendi para clientes e sei fechar. Então vou direto: apostaram em mim uma vez e deu certo. Aposte de novo e eu cobro de mim as entregas acima.</p>
-      <p class="contact">Mateus Brito · Salvador/BA<br>mateusbrito2005@gmail.com · (71) 99162-5252</p>
+      <p>Apostaram em mim uma vez e deu certo. Se o quiz te convenceu, me chama.</p>
+      <a class="cta wa" href="https://wa.me/5571991625252?text=Oi%20Mateus%21%20Fiz%20o%20quiz%20inteiro%20e%20o%20resultado%20deu%3A%20eu%20preciso%20de%20voc%C3%AA%20no%20meu%20time.%20Reclama%C3%A7%C3%B5es%2C%20s%C3%B3%20depois%20que%20voc%C3%AA%20aceitar.%20Bora%3F" target="_blank" rel="noopener">Chamar o Mateus no WhatsApp <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span></a>
     </section>
   </div>
 </div>
