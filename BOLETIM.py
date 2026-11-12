@@ -31,6 +31,16 @@ TODAS_UFS = (
     "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO"
 ).split()
 
+# Municípios no escopo (nome sem acento -> empresa(s))
+MUNICIPIOS = {
+    "sao paulo": "Braskem Green / Voqen",
+    "rio de janeiro": "Voqen",
+    "salvador": "Voqen",
+    "triunfo": "Braskem Green",
+    "araucaria": "Braskem Green",
+}
+MUNICIPAL_FORA_DO_ESCOPO = "revisar"       # "revisar" = mantém marcado | "descartar"
+
 PALAVRAS_LAIS = ["ICMS", "IPI", "ISS"]     # demais -> GABI
 
 COLUNAS = ["Nº Boletim", "Tema", "Analista responsável", "Ação demandada", "Tarefa"]
@@ -223,8 +233,13 @@ def abrangencia(p, tipo):
         return True, ""
 
     if tipo == "MUNICIPAL":
-        # TODO: trocar pela regra atual da área quando for conhecida
-        return True, "Municipal: validar empresa/abrangência"
+        for texto in (norm(p["titulo"]), norm(" ".join(p["bloco"]))):
+            for cidade in MUNICIPIOS:
+                if re.search(rf"\b{cidade}\b", texto):
+                    return True, ""
+        if MUNICIPAL_FORA_DO_ESCOPO == "descartar":
+            return False, ""
+        return True, "Municipal: município não identificado no escopo"
 
     ufs = ufs_do_titulo(p["titulo"])
     bloco = norm(" ".join(p["bloco"]))
